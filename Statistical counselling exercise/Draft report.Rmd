@@ -1,0 +1,250 @@
+---
+title: Candidates shows better cognitive flexibility when listening to music compare to quiet enviroment
+author: "Yuhan Hu"
+date: "2019/11/11"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(readr)
+library(knitr)
+library(nlme)
+library(emmeans)
+data <- read_csv("cleandata_long.csv")
+names(data) <- c("id", "cblind", "english", "vgames", "device", "headphones", "alllevels", "distraction", "sleep", "start", "offtime", "ontime", "runsoff", "runson", "diff", "order")
+```
+
+
+\pagebreak
+
+# Introduction
+
+**Cognitive flexibility** is the ability of the brain to shift between thinking about different concepts or between different tasks (Braem and Egner, 2018). It has been hypothesized that auditory distraction might have an effect on cognitive flexibility. To investigates effect of **auditory distraction** on **cognitive distraction**, 72 candidates were asked to perform stroop tests by Stroop test app on their phone when listening to different music. 8 other measurements were also recorded because they might have potention effect on result of the experiment.
+
+Details about experiment setting and statistical analysis will be discussed in Method section. Answer to the research question is concluded in result section. Future direction and Potential question underlying this analysis are in discussion section
+
+# Method
+## Experiment Setting
+
+In this experiment, different music is regarded as different auditory distraction levels. There are 3 treatment levels in total, which are lyrics, classical and quiet, where quiet enviroment is the reference group. Candidates are required to perform 3 rounds of stroop tests under all 3 distraction levels. For each round of stroop test, candidates are required to successfully complete 5 on runs and 5 off runs. Time spend for on-run, time spend for off-run, difference between on-time and off-time, total runs to complete on-run and total runs to complete off-run are collected.
+
+Since ability of shifting between different tasks is interested, differences between stroop on-time and off-time time is a more appropriate response variabel than on-time and off-time. Smaller the difference, better the cognitive flexibility. Experimetnal data was collected from all 72 students enrolled in sUofT STA490 2019-2020 session. 
+
+Besides two main variables mentioned above, some other variables that might have effect on **cognitive distracion** were also collectd. They are types of headphones, order in which the 3 levels of auditory distraction were used, number of years candidate have studied in English language institution, whether or not candidate play video games, hours of sleep before (for each level of auditory distraction), time of day(for each level of distraciton), whether or not the candidate are colour blind, type of device  used for Stroop test app.
+
+## Statistical Analysis
+
+### Brief Data cleaning
+
+No observation was eliminated from analysis for any reason. However, observations from candidate No. 12, 31, 66 are questionable and require manipulation. More specifically, unexpected values for number of runs, which means values are either non-positive  or non-integer, are set to 5. Unexpected values for run-time, which means the value are so small that looks like run-time of 1 run rather than 5 successful runs, we multiply the collected value by 5 and use the resultant values for further analysis.
+
+### Model
+
+Since the research requestion interested in 'how auditory distraction affects cognitive flexibility', variable represent cognitive flexibility is the response variable, which is difference between on-time and off-time. Variable represents auditory distraction level is the predictor variable of interest, so it is taken into the model as fixed effect.
+
+Since multiple observations were collected from single candidate in this experiment, apparently observations from same subject are not independent; thus a random intercept effect have to be added into the model to accomadate variation due to individual difference among candidates. 
+
+In addition, covariate **order** in which the 3 levels of auditory distraction were used, is also very important since mean of reponse collected under same distraction level differ if order of distraction is different(***Appendix Table 4***), so this is also taken into model as fixed effect. 
+
+In addition, refer to the non-significant p-value of the interaction term, interaction term between order and distraction was excluded from the model.
+
+```{r diffmodel,echo = FALSE}
+
+simple.model.plus.order <- lme(diff ~ distraction*order, random=~1|id, method="REML", data=data)
+kable(anova(simple.model.plus.order), caption = 'Model with interaction term', digits = 3)
+
+# remove interaction
+simple.model.plus.order.no.ix <- lme(diff ~ distraction + order, random=~1|id, method="REML", data=data)
+kable(anova(simple.model.plus.order.no.ix),caption = 'Model without interaction term', digits = 3)
+
+```
+
+Therefore, in our model, differences between on-time and off-time is the response variable, order and disctraction levels are fixed effect predictor variable, and candidate is the random intercept effect.
+
+$Y=\sum\beta X+u+\epsilon$ where $Y$ is the response, $\sum\beta X$ is the fixed effects times corresponding coefficients $u$ is the random effect and $\epsilon$ is the random error.
+
+### Model Verification
+
+For a linear mixed model, it have to satisify several assumption to be regarded as a valid model. 
+
+```{r modelandplot, echo = FALSE}
+#fitted plot
+plot(simple.model.plus.order.no.ix, main = 'Residual Plot')
+```
+
+From the residual plot, we can see that the residual is scatter randomly around 0, so no deviation from linear form is detected, assumpition of linearity holds.In addition, relatively constant variance is also shown on this plot.
+
+Then we examine whether allowing the error variance to vary will result in a better fit, result is shown in ***Appendix Table***. Based on the non-significant likelihood ratio, we can conclude that variance is constant across distraction levels and orders.
+
+```{r}
+# random effects
+qqnorm(simple.model.plus.order.no.ix, ~ranef(.), id=0.05, cex=0.7, main = 'random effect normal quantile-quantile plot')
+```
+
+From the Normal q-q plot for random effect, we can see that it is close to the line **x=y** if remove outliers, therefore, normality of random effect holds.
+
+```{r}
+# by order 
+plot(simple.model.plus.order.no.ix, resid(., type="p")~fitted(.)|order, id=0.05, adj=-.3)
+plot(simple.model.plus.order.no.ix, resid(., type="p")~fitted(.)|distraction, id=0.05, adj=-.3)
+```
+
+From this two plots, we can see that variance between different orders and distraction levels are roughly equivalent. Moreover, we show correlation are nearly constant in different distraction levels and orders. Then we calculate covariance to show that homoscedasticity assumption of random effect holds. Correponding matrix are shown in Correlation and Variance-Covariance section of Appendix.
+
+```{r}
+# marginal residuals
+par(mfrow=c(1,2))
+qqnorm(resid(simple.model.plus.order.no.ix, level=0), main = 'marginal residual normal Q-Q plot')
+# conditional residuals 
+qqnorm(resid(simple.model.plus.order.no.ix,level=1),main = 'conditional residual normal Q-Q plot') # same as from residuals command
+```
+
+From the right plot, we can see that marginal residual is approximately normal distributed since the plot is close to the line **x=y**.
+From the left plot, we can see that conditional residual is approximately normal distributed since the plot is close to the line **x=y**. Therefore, normality of error term is verified.
+
+In conclusion, model assumpitions hold and the model is valid.
+
+## Covariates
+
+Color blindness is excluded from analysis since there is only one color blind participant; thus it's impossible to analyze effect of color blindness.
+
+For the rest of covariates, we built one model with interaction term between covariates and distraction and another model witout interaction then check p-value for corresponding p-value. Tables is shown in appendix.
+
+# Result
+
+As estimatied marginal mean table of the model shwon, reference group, which is quiet enviroment, has the greatest estiamted mean. Recall that smaller the response variable, better the cognitive flexibility. So distraction level do affect cognitive flexibility, and people shows worse cognitive flexibility in quiet enviroment. In addition, based on the lmertable, we can conclude approximately $\frac{\sigma^2}{\sigma^2+\tau^2}=44.9\%$ of variation is due to individual cognitive flexibility difference.
+
+```{r}
+kable(Pmisc::lmeTable(simple.model.plus.order.no.ix), digits = 3, caption = 'lmertable of model')
+kable(summary(emmeans(simple.model.plus.order.no.ix, ~distraction)), caption = 'Estimated marginal means for distraction', digits = 3)
+```
+
+As for covariates, only **headphones** and **device** are significant. In addition, the corrsponding interaction terms are not significant. From corresponding table of their marginal mean(***Appendix Table 12 and 15***) we can see that candidates wearing noise-cancelling headphones and candidate who used Apple devices have smaller marginal mean, which means better cognitive flexibility.   Since we did not corporate these covariates into a single model, exact values of their coefficients do not contain much informaiton.
+
+# Discussion
+
+There are several problem underlying this experiment. First, the reference distraction group, quiet enviroment, is very subjective since we simply label no music as quiet. However, variation due to enviromental noises may affect experiment result largely. Second, all candidates have similar age and education background, which means result obtained from this experiment may not be universal. Future experiment may be conducted on candidates from a wider demographics range. Third, though we have found 2 covariate that may have significant effect on experiment effect, they are not incorporate into a single model, therefore corresponding effects on stroop test result require further investigation. Fourth, imputation for people who had fewer than 5 runs affect the model significantly(***Appendix Tbale 20***), after remove those candidates, the main fixed effect we concerned about become non-significant. Fifth, there are oultiers in residual qq plot, which are participants 31,35,72. Last, there are observations with ontime-Offtime discrepancies, which means values for differences are not equivalent to values obtained by subtracting ontime by offtime. In addition, fixed effect order becomes non-significant in model using value obtained from subtraction.(***Appendix Table 21***)
+
+\pagebreak
+
+# Appendix
+
+## Importance of order effect
+
+```{r groupmeanbyorder, echo = FALSE}
+kable(data %>% group_by(distraction, order) %>% summarize(means = mean(diff)), caption = 'Mean of response under different distraction levels with respect to different order of distractions', digits = 3)
+```
+
+
+### Examine whether variance differing with distraction / order gives better fit
+
+```{r}
+# check variance differing with distraction
+model.Vdistraction <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|distraction), method="REML", data=data)
+anova(model.Vdistraction)
+kable(anova(simple.model.plus.order.no.ix, model.Vdistraction),digits = 3)
+
+# check variance differing with order
+model.Vorder <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model.Vorder)
+kable(anova(simple.model.plus.order.no.ix, model.Vorder),digits = 3)
+#summary(emmeans(model.Vorder, ~distraction))
+```
+
+## Correlation and Variance-Covariance
+
+```{r,echo =TRUE}
+
+print('Correlation and Variance-Covariance matrices by distraction')
+cor(cbind(data$diff[data$distraction=="control"],
+data$diff[data$distraction=="lyrics"],
+data$diff[data$distraction=="classical"]))
+
+var(cbind(data$diff[data$distraction=="control"],
+data$diff[data$distraction=="lyrics"],
+data$diff[data$distraction=="classical"]))
+
+print('Correlation and Variance-Covariance matrices by order')
+cor(cbind(data$diff[data$order==1],
+data$diff[data$order==2],
+data$diff[data$order==3]))
+
+var(cbind(data$diff[data$order==1],
+data$diff[data$order==2],
+data$diff[data$order==3]))
+```
+
+## english
+```{r}
+model_en <- lme(diff ~ distraction*english + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_en), caption = 'Model after adding covariate years of English and corresponding interaction term')
+model_en <- lme(diff ~ distraction + order + english, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_en), caption = 'Model after adding covariate years of English but no interaction term')
+```
+
+## video games
+```{r}
+model_vg <- lme(diff ~ distraction*vgames + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_vg), caption = 'Model after adding covariate videogames and corresponding interaction term' )
+model_vg <- lme(diff ~ distraction + order + vgames, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_vg), caption = 'Model after adding covariate videogames but no interaction term' )
+```
+
+## device
+```{r}
+model_dv <- lme(diff ~ distraction*device + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_dv), caption = 'Model after adding covariate devices and correpsonding interaction term')
+model_dv <- lme(diff ~ distraction + order + device, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_dv), caption = 'Model after adding covariate device but no interaction term')
+kable(summary(emmeans(model_dv, ~device)), caption ='Estimated marginal mean for models with covariate device', digits = 3)
+```
+
+## headphones
+```{r}
+model_hp <- lme(diff ~ distraction*headphones + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_hp), caption = 'Model after adding covariate headphones and correpsonding interaction term')
+model_hp <- lme(diff ~ distraction + headphones + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_hp), caption = 'Model after adding covariate headphones but no interaction term')
+kable(summary(emmeans(model_hp, ~headphones)), caption = 'Estimated marginal means for headphones', digits = 3)
+#kable(Pmisc::lmeTable(model_hp), caption = 'lmer table for models with covariate headphones', digits = 3)
+```
+
+## hours of sleep
+```{r}
+model_sl <- lme(diff ~ distraction*sleep + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_sl),caption = 'Model after adding covariate hours of sleep and correpsonding interaction term')
+model_sl <- lme(diff ~ distraction + sleep + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_sl), caption = 'Model after adding covariate hours of sleep but no interaction term')
+```
+
+## start time
+```{r}
+model_start <- lme(diff ~ distraction*start + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_start),caption = 'Model after adding covariate start time and correpsonding interaction term')
+model_start <- lme(diff ~ distraction + start + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_start),caption = 'Model after adding covariate start time but no interaction term')
+```
+
+## Discrepancies
+
+```{r}
+# students 12, 31, 66
+data <- data %>% mutate(runs_error = ifelse(id %in% c(12, 31, 66), 1, 0))
+data %>% group_by(runs_error) %>% summarize(means = mean(diff))
+data_nre <- data %>% filter(runs_error==0)
+model.Vorder.nre <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data_nre)
+kable(anova(model.Vorder.nre), caption = 'anova table for model without id 12,31,66')
+#summary(emmeans(model.Vorder.nre, ~distraction))
+```
+
+```{r}
+data <- data %>% mutate(calc_diff = ontime - offtime)
+model.Vorder.calc <- lme(calc_diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model.Vorder.calc), caption = 'anava table for model using difference obtained from subtraciton as response variable')
+```

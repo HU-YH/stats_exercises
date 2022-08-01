@@ -1,0 +1,667 @@
+---
+title: ' The Statistical Analysis Report on The Effect of Auditory distractions on Cognitive Flexibility. '
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+# Abstract: 
+From this report, we found out that general backgroup noises would deficit cognitive flexibity,since the earphones with noise cancelling resulted in a higher cognitive flexibity than the earphones that did not cancel noises.Also,subjects have higher cognitive flexibity in a quiet enviroment than listenning to music with lyrics. However,there is an exception to classical music, it has higher cognitive flexibility than quiet condition.
+
+
+From our final model, the average time difference between the on and off Stroop test for a subject under quiet background noise with in-ear and noise cancelling earphones was around 6.47 seconds. In general, the earphones with noise cancelling resulted in lower time differences than the earphones that did not cancel noises. Moreover, we found that the average time differences were smaller for order two and order three. This phenomenon proved our hypothesis that subjects performed better on this test with more trials. Subjects had lower time differences when classical music was chosen as their second test or third test to complete, which suggests that listening to classical music results in higher cognitive flexibility than  under the quiet condition. In addition, we found that listening to music with lyrics as the second or third test will result in higher value of time differences, which implies lower cognitive flexibility.
+
+# Introduction:
+Cognitive flexibility is the ability of the brain to shift between doing different tasks or thinking about different concepts. (Braem and Egner,2018). In our research, we are investigating whether the auditory distractions will have an effect on cognitive flexibility. In order to capture cognitive flexibility, each individual completed three sets of stroop tests through an app on their electronic devices. During each test, the respondent was required to identify what colour of a displayed word was written in while this word itself was a noun for color. We replicated this process under three different auditory stimulus.
+
+The objective of this statistical analysis is to use appropriate statistical methods and select a model to test the effects of auditory distractions on cognitive flexibility. Given in the experiment, there are two important explanatory variables: distraction levels and the order of completing those levels. We also used the interaction term between these two variables to see whether the cognitive flexibility performance was due the different orders of distraction levels based on personal choices. Then, we tested all the remaining covariates in the given dataset to see whether they were statistically significant - for example, we found that the type of earphones were an important covariate in this experiment. 
+
+We firstly solved some issues that were found in the exploratory data analysis (EDA), and analyzed the effect of order, distraction level and the interaction term on the cognitive flexibility performance. We then tested model assumptions and dealt with outliers. Later, we interpreted the results and started to test covariates into the model. Lastly, we included one useful covariate (the type of headphones used) into our model.
+
+
+
+# Method: 
+The first step we did for this report was to address some issues that we found in the exploratory data analysis (EDA), such as correcting some numbers that some subjects had misplaced. 
+Then our analysis emphasized investigating the research question - “Does auditory distraction  affect cognitive flexibility”.
+
+
+## General settings in our experiment: 
+The tool we used to measure cognitive flexibility is called EncephalApp Stroop test. This app has two operational settings - Stroop Off and Stroop On tests. Subjects are required to successfully pass five runs of a Stroop Off test before they do a Stroop On test. Here, the Stroop Off test functions as a practice run, and aims to get subjects more familiarized with the app and test. Then subjects do a Stroop On test which contains ten stimuli and a mistake will stop the run.
+
+## Reasons for choosing OnTime_minus_OffTime as our response variable: 
+The difference between the Stroop On test and the Stroop Off test will be the direct and isolated measure for a subject’s cognitive flexibility. (STA490 handout)
+
+## Reasons for choosing distraction levels as our response variable: 
+Each subject was required to complete three sets of Stroop On and Stroop Off test under three different levels in order to test whether the auditory distractions affect people’s cognitive flexibility. One level is  “Quiet” , where subjects were completing the Stroop test with earphones but without any background noise or music. Another level was “Classical Music” , where subjects were completing the Stroop test while classical instrumental music - Mozart's Piano Sonata No.8 in A minor played in the background through the earphones. The last level was “Music with Lyrics”, where subjects were completing the Stroop test while a song with a vocal component - Shape of You by Ed Sheeran - played in the background. 
+
+## Reasons for choosing order levels as our response variable: 
+The order of each auditory distraction level was chosen randomly by participants. This order was included in the results as some subjects would complete certain subsequent orders faster than the ones before due to gaining familiarity with the test. 
+
+
+## Reasons for having a random effect for each individual: 
+We recorded three observations for each individual, and these three observations were correlated. Also, each individual had different cognitive flexibilities to start with. Therefore, we used a random effect to capture these individual differences and correlations between observations.
+
+
+## Model_1  with “ Distraction Level” and “ Order” as Predictor Variables And a Random Effect for each subject: 
+In this stage of data analysis, we addressed the research question of whether or not auditory distraction affected cognitive flexibility. First, we plotted the measure of cognitive flexibility (which was the time difference between the Stroop On test and the Stroop Off test) versus the three different distraction levels to test any potential main effect that was caused by this explanatory variables. (as Figure 1)   
+
+Then later we fitted the most basic model as following: 
+
+### \(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ b_i+e_{ij}  \)
+
+i stands for each subject(i = 1,2,3,...,72)  
+
+j is the number of observations(j = 1,2,3,...,216)   
+
+(\beta_{0}) is when subjects choose to have a quiet backgroud auditory level as their first distraction level.   
+
+Y_{ij} is the difference between On time and Off time, which is the direct measure of cognitive flexibility  
+
+bi is the random effect,which is the variation among people  
+
+eij is the error term  
+
+
+## Model_2  with “ Distraction Level” and “ Order”, and the interaction term between them  as Predictor Variables And a Random Effect for each subject: 
+
+
+The most important explanatory variable in our model was the distraction level which directly answered our research question, followed by the order of which we conducted these distraction levels. In order to find any interactions that may have existed between the variables, we tested the interaction term models with a likelihood ratio test. 
+
+
+### \(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+b_i+e_{ij}\)
+
+
+i stands for each subject(i = 1,2,3,...,72)  
+
+j is the number of observations(j = 1,2,3,...,216)   
+
+(\beta_{0}) is when subjects choose to have a quiet backgroud auditory level as their first distraction level.   
+
+Y_{ij} is the difference between On time and Off time, which is the direct measure of cognitive flexibility  
+
+bi is the random effect,which is the variation among people  
+
+eij is the error term  
+
+
+## Model_3  is Model_2  with  Six More Potential Covariates : 
+
+We also collected an additional variable of whether or not the participating subject was colour-blind. As only one participant stated that they were colour blind, and the stroop test relied on differentiating colors, we decided not to use this point of data.   
+
+There were six potential covariates in our dataset:   
+
+1. Type of headphones used (over-ear or in-ear / noise-cancelling or not noise-cancelling) 
+2. Number of years you have studied at an English language institution (including 2019-20)
+3. Whether or not you play video games
+4. Hours of sleep the night before (for each level of auditory distraction)
+5. Time of day (for each level of auditory distraction)
+6. Type of device used for the Stroop test app
+
+
+
+## Model_4with “ Distraction Level” and “ Order”, and the interaction term between them  as Predictor Variables, a Random Effect for each subject and a type of earphone variable: 
+
+After F-Test on these covariates and some likelihood ratio test,we included the only useful covariate in to our model. 
+ANd the finalized model as following: 
+
+### \(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+\beta_9I_{In ear: No Noise Cancelling }+\beta_10I_{Over ear: No Noise Cancelling }+\beta_11I_{Over ear: Yes Noise Cancelling }+b_i+e_{ij}\)
+
+
+
+
+
+
+
+
+
+
+
+
+# Result: 
+
+## Model_1  with “ Distraction Level” and “ Order” as Predictor Variables And a Random Effect for each subject: 
+
+
+```{r library collection,echo=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(stringr)
+library(nlme)
+library(tidyverse)
+library('dplyr')
+library(Pmisc)
+library(lmtest)
+set.seed(1111)
+```
+
+
+
+```{r clean dataset,echo=FALSE, warning=FALSE, include=FALSE}
+widedata <- read.csv("sta490_cognitive_flexibility_data.csv")
+
+# glimpse(widedata)
+
+# Clean up variable names
+varnames <- c("id","color_blind", "yrs_english", "video_games", "device", "headphones", "order_of_levels", 
+              "level1", "sleep1", "start_time1", "OffTime1", "OnTime1", "Total_runs_Stroop_Off1", 
+              "Total_runs_Stroop_On1", "OnTime_minus_OffTime1", 
+              "level2", "sleep2", "start_time2", "OffTime2", "OnTime2", "Total_runs_Stroop_Off2", 
+              "Total_runs_Stroop_On2", "OnTime_minus_OffTime2", 
+              "level3", "sleep3", "start_time3", "OffTime3", "OnTime3", "Total_runs_Stroop_Off3", 
+              "Total_runs_Stroop_On3", "OnTime_minus_OffTime3",
+              "ID")
+dim(widedata)
+length(varnames)
+
+names(widedata) <- varnames
+
+widedata <- widedata %>% select(-ID)
+dim(widedata)
+
+glimpse(widedata)
+
+
+#Lots of things to clean up.
+
+# Clean up
+
+#Look at variables one at a time and clean up format.
+#Check for internal consistency with order of levels of auditory distraction on difference bettwen Stroop On and Stroop Off times.
+
+
+
+#table(widedata$color_blind) # OK
+
+#table(widedata$yrs_english) # Remove strings, convert to numerics
+widedata <- widedata %>% 
+  mutate(yrs_english = str_trim(str_remove(yrs_english, "years"))) %>%
+  mutate(yrs_english = ifelse(yrs_english=="five", 5, yrs_english)) %>%
+  mutate(yrs_english = as.numeric(yrs_english))
+
+#table(widedata$video_games) # OK
+
+#table(widedata$device)      # OK
+
+#table(widedata$headphones)  # OK
+
+#table(widedata$order_of_levels) # need to split
+widedata <- widedata %>% mutate(distraction1 = str_split(order_of_levels, ";", simplify=T)[,1]) %>%
+  mutate(distraction2 = str_split(order_of_levels, ";", simplify=T)[,2]) %>%
+  mutate(distraction3 = str_split(order_of_levels, ";", simplify=T)[,3])
+widedata <- widedata %>% mutate(distraction1 = ifelse(distraction1 == "Control (quiet)", "control",
+                                ifelse(distraction1 == "Song with lyrics (Shape of You by Ed Sheeran)", "lyrics",
+                                ifelse(distraction1 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction2 = ifelse(distraction2 == "Control (quiet)","control",
+                               ifelse(distraction2 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction2 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction3 = ifelse(distraction3 == "Control (quiet)","control",
+                               ifelse(distraction3 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction3 == "Classical (Mozart)", "classical", "")))  )
+
+#table(widedata$level1)       # Need to clean up labels
+#table(widedata$level2)       # Need to clean up labels
+#table(widedata$level3)       # Need to clean up labels
+
+widedata <- widedata %>% 
+  mutate(level1 = str_to_lower(level1)) %>%
+  mutate(level2 = str_to_lower(level2)) %>%
+  mutate(level3 = str_to_lower(level3))
+
+# Clean up levels
+clean_levels <- function(x){
+  x[str_detect(x, pattern = "quiet")] <- "control"
+  x[str_detect(x, pattern = "quite")] <- "control"
+  x[str_detect(x, pattern = "control")] <- "control"
+  x[str_detect(x, pattern = "silent")] <- "control"
+  x[str_detect(x, pattern = "no musics")] <- "control"
+  
+  x[str_detect(x, pattern = "without lyrics")] <- "classical"
+  x[str_detect(x, pattern = "no lyrics")] <- "classical"
+  
+  x[str_detect(x, pattern = "sheeran")] <- "lyrics"
+  x[str_detect(x, pattern = "sherron")] <- "lyrics"
+  x[str_detect(x, pattern = "shape")] <- "lyrics"
+  x[str_detect(x, pattern = "lyrics")] <- "lyrics"
+  x[str_detect(x, pattern = "lyric")] <- "lyrics"
+  x[str_detect(x, pattern = "song")] <- "lyrics"
+  
+  x[str_detect(x, pattern = "classical")] <- "classical"
+  x[str_detect(x, pattern = "classic")] <- "classical"  
+  x[str_detect(x, pattern = "mozart")] <- "classical"
+  x[str_detect(x, pattern = "instrumental")] <- "classical"
+  return(x)
+}
+
+widedata <- widedata %>% mutate(level1 = clean_levels(level1),
+                          level2 = clean_levels(level2),
+                          level3 = clean_levels(level3))
+
+## Check auditory distraction levels for consistency
+#widedata %>% filter(distraction1 != level1 | distraction2 != level2 | distraction3 != level3) %>% 
+#  filter(order_of_levels != "") %>% 
+#  select(id, distraction1, level1, distraction2, level2, distraction3, level3, 
+#         OnTime_minus_OffTime1, OnTime_minus_OffTime2, OnTime_minus_OffTime3)
+
+#table(widedata$sleep1)       # Need to strip characters, convert to numeric
+#table(widedata$sleep2)
+#table(widedata$sleep3)
+
+# Clean up hrs of sleep
+clean_sleep <- function(x){
+ x <- str_remove(x, "hrs")  
+ x <- str_remove(x, "hours")
+ x <- str_remove(x, "h")
+ x <- str_remove(x, "Hours")
+ x <- str_trim(x)
+ x <- as.numeric(x)
+ return(x)
+}
+
+widedata <- widedata %>% mutate(sleep1 = clean_sleep(sleep1),
+                         sleep2 = clean_sleep(sleep2),
+                         sleep3 = clean_sleep(sleep3))
+
+#table(widedata$start_time1)  # almost 72 different values in different formats
+#table(widedata$start_time2)  # almost 72 different values in different formats
+#table(widedata$start_time3)  # almost 72 different values in different formats
+
+
+# Create variables for nearest hour in 24 hour clock (done by hand from values)
+widedata$start_time1_hour <- c(17, 11, 13, 12, 11, 13, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 17, 20, 14.5, 20.5, 22, 19, 24, 
+                              21, 9, 20, 23, 12, 19, 12, 16, 21, 17, 20, 15, 17, 20, 20, 11, 20, 21, 16, 23, 21, 7, 20, 19, 23, 
+                              22, 19, 18, 22, 14, 12, 14, 24, 17, 13, 18, 18, 11, 16, 20, 23, 16, 16, 20, 23, 20, 23)  
+widedata$start_time2_hour <- c(17, 12, 13.5, 12, 11.5, 14, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 17.5, 20, 15, 21, 22, 19,
+                               12, 21, 9, 22, 12, 12, 20, 12, 16,  21, 17, 19, 15, 17, 20, 20, 11, 20, 21, 16, 23, 21, 7, 20, 18, 23,
+                               9, 19, 18, 20, 14.5, 12, 14, 24, 17, 13, 18, 18, 11, 26, 20, 14, 16, 16, 20, 11, 16, 11)   
+widedata$start_time3_hour <- c(18, 12, 13, 12, 12, 14, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 18,  20, 15, 21, 22, 18, 24,
+                               21, 9, 22, 12, 12, 20, 12, 16, 21, 18, 19, 15, 17, 21, 20, 12, 20, 20, 16, 23, 21, 7, 20, 19, 23, 1, 19,
+                               18, 22, 15, 12, 14, 0, 17, 13, 18, 18, 11, 7, 20.5, 15.5, 16, 16, 21, 11, 16, 11)   
+widedata <- widedata %>% select(-c(start_time1, start_time2, start_time3))
+# collapse to morning, afternoon, evening
+widedata <- widedata %>% mutate(start_time1_hour = ifelse(start_time1_hour >= 7 & start_time1_hour <= 12, "morning",
+                                               ifelse(start_time1_hour >=12.5 & start_time1_hour <= 18, "afternoon", "evening")))
+widedata <- widedata %>% mutate(start_time2_hour = ifelse(start_time2_hour >= 7 & start_time2_hour <= 12, "morning",
+                                               ifelse(start_time2_hour >=12.5 & start_time2_hour <= 18, "afternoon", "evening")))
+widedata <- widedata %>% mutate(start_time3_hour = ifelse(start_time3_hour >= 7 & start_time3_hour <= 12, "morning",
+                                               ifelse(start_time3_hour >=12.5 & start_time3_hour <= 18, "afternoon", "evening")))
+
+# outcome variables
+# times
+#table(widedata$OffTime1)     # Convert to numeric; strip characters
+#table(widedata$OffTime2) 
+#table(widedata$OffTime3) 
+#table(widedata$OnTime1)      # Convert to numeric; strip characters
+#table(widedata$OnTime2) 
+#table(widedata$OnTime3) 
+#table(widedata$OnTime_minus_OffTime1)  # convert to numeric; strip characters
+#table(widedata$OnTime_minus_OffTime2)
+#table(widedata$OnTime_minus_OffTime3)
+
+# Clean up response times (OnTime, OffTime, OnTime_minus_OffTime)
+clean_response_times <- function(x){
+  x <- str_remove(x, "s")
+  x <- str_remove(x, "S")
+  x <- str_remove(x, "`")
+  x <- str_trim(x)
+  x <- as.numeric(as.character(x))
+  return(x)
+}
+
+widedata <- widedata %>% mutate(OffTime1 = clean_response_times(OffTime1),
+                         OnTime1 = clean_response_times(OnTime1),
+                         OnTime_minus_OffTime1 = clean_response_times(OnTime_minus_OffTime1),
+                         OffTime2 = clean_response_times(OffTime2),
+                         OnTime2 = clean_response_times(OnTime2),
+                         OnTime_minus_OffTime2 = clean_response_times(OnTime_minus_OffTime2),
+                         OffTime3 = clean_response_times(OffTime3),
+                         OnTime3 = clean_response_times(OnTime3),
+                         OnTime_minus_OffTime3 = clean_response_times(OnTime_minus_OffTime3))
+
+# Check that subtracted times are OnTime_minus_OffTime
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime1 - diff1)) %>%
+  filter(abs(OnTime_minus_OffTime1 - diff1) > .0011) %>%
+  select(id, OnTime1, OffTime1, OnTime_minus_OffTime1, diff1, diffofdiff )
+
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime2 - diff2)) %>%
+  filter(abs(OnTime_minus_OffTime2 - diff2) > .0011) %>%
+  select(id, OnTime2, OffTime2, OnTime_minus_OffTime2, diff2, diffofdiff )
+
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime3 - diff3)) %>%
+  filter(abs(OnTime_minus_OffTime3 - diff3) > .0011) %>%
+  select(id, OnTime3, OffTime3, OnTime_minus_OffTime3, diff3, diffofdiff )
+
+#table(widedata$Total_runs_Stroop_Off1) # OK ( weird that some have < 5)
+#table(widedata$Total_runs_Stroop_On1)  # OK ( weird that some have < 5 - may want to filter these out.  Look to see if their times are much shorter
+#table(widedata$Total_runs_Stroop_Off2) 
+#table(widedata$Total_runs_Stroop_On2)
+#table(widedata$Total_runs_Stroop_Off3) 
+#table(widedata$Total_runs_Stroop_On3)
+
+# find value that had Total_runs_Stroop_Off2 == -3.532
+### widedata %>% filter(Total_runs_Stroop_Off2 == -3.532) 
+# id 68, presume switched with runs OnTime_minus_OffTime2 which is 5 and is consistent with OnTime2-OffTime2
+widedata <- widedata %>% mutate(OnTime_minus_OffTime2 = ifelse(id %in% "68", -3.532, OnTime_minus_OffTime2)) %>%
+  mutate(Total_runs_Stroop_Off2 = ifelse(id %in% "68", 5, Total_runs_Stroop_Off2))
+# find value that had Total_runs_Stroop_Off3 == 12.142
+#### widedata %>% filter(Total_runs_Stroop_Off3 == 12.142) 
+# id 66, also OffTime3 is missing, presume it is as follows
+widedata <- widedata %>% mutate(OffTime3 = ifelse(id %in% "66", 12.142, OffTime3)) %>%
+  mutate(Total_runs_Stroop_Off3 = ifelse(id %in% "66", 2, Total_runs_Stroop_Off3)) %>%
+  mutate(OnTime_minus_OffTime3 = ifelse(id %in% "66", OnTime3-OffTime3, OnTime_minus_OffTime3))
+### widedata %>% filter(id %in% "66")
+   
+# Check values when number of runs is less than 5
+#widedata %>% select(OnTime1, OffTime1, OnTime2, OffTime2, OnTime3, OffTime3) %>% summarize_all(funs(min, max, median))
+### widedata %>% filter(Total_runs_Stroop_On1 < 5 | Total_runs_Stroop_Off1 < 5 |
+###                      Total_runs_Stroop_On2 < 5 | Total_runs_Stroop_Off2 < 5 | 
+###                      Total_runs_Stroop_On3 < 5 | Total_runs_Stroop_Off3 < 5) %>%
+###             select(id, Total_runs_Stroop_On1, OnTime1, Total_runs_Stroop_Off1, OffTime1, Total_runs_Stroop_On2, OnTime2,
+###                    Total_runs_Stroop_Off2, OffTime2, Total_runs_Stroop_On3, OnTime3, Total_runs_Stroop_Off3, OffTime3)
+
+# Presume that all of these are values for one run only so multiply values by 5; there are consistent small values for id 12, 31, 66
+## Presume runs 5
+widedata <- widedata %>% mutate(OnTime1 = ifelse(id %in% c("12", "31", "66"), 5*OnTime1, OnTime1)) %>%
+  mutate(OffTime1 = ifelse(id %in% c("12", "31", "66"), 5*OffTime1, OffTime1)) %>%
+  mutate(OnTime2 = ifelse(id %in% c("12", "31", "66"), 5*OnTime2, OnTime2)) %>%
+  mutate(OffTime2 = ifelse(id %in% c("12", "31", "66"), 5*OffTime2, OffTime2)) %>%
+  mutate(OnTime3 = ifelse(id %in% c("12", "31", "66"), 5*OnTime3, OnTime3)) %>%
+  mutate(OffTime3 = ifelse(id %in% c("12", "31", "66"), 5*OffTime3, OffTime3)) %>%
+  mutate(OnTime_minus_OffTime1 = ifelse(id %in% c("12", "31", "66"), OnTime1-OffTime1, OnTime_minus_OffTime1)) %>%
+  mutate(OnTime_minus_OffTime2 = ifelse(id %in% c("12", "31", "66"), OnTime2-OffTime2, OnTime_minus_OffTime2)) %>%
+  mutate(OnTime_minus_OffTime3 = ifelse(id %in% c("12", "31", "66"), OnTime3-OffTime3, OnTime_minus_OffTime3)) %>%
+  mutate(Total_runs_Stroop_On1 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On1)) %>%
+  mutate(Total_runs_Stroop_On2 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On2)) %>%
+  mutate(Total_runs_Stroop_On3 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On3)) %>%
+  mutate(Total_runs_Stroop_Off1 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On1)) %>%
+  mutate(Total_runs_Stroop_Off2 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On2)) %>%
+  mutate(Total_runs_Stroop_Off3 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On3)) 
+
+
+
+
+
+              
+#Variables where no obvious changes are needed: 
+
+# colour_blind  
+#* video_games  
+#* device  
+#* headphones  
+
+#Summary of changes: 
+
+#* yrs_english: Remove strings; convert numbers in text to digits  
+#* order_of_levels: needed to be split into levels, creating variables distraction1/2/3 with levels control/lyrics/classical; there are lots of missing values so will rely on level variable that was input for each auditory distraction  
+#* level1/2/3: rationalize all input values to one of control/lyrics/classical  
+#* sleep1/2/3: strip characters and convert to numeric  
+#* start_time1/2/3:    
+#+ created hour variable (e.g., start_time1_hour) by hand (numeric, value from 1-24, with .5 only when exact)  
+#+ 2 values of "Evening" changed to 19h, value of "dinner time" change to 18h  
+#+ values of 4:53, 5:00 presumed to be PM  
+#+ then changed to morning (7am-noon), afternoon(12:30-18), evening
+#* OnTime1/2/3, OffTime1/2/3, OnTime_minus_OffTime1/2/3: Remove strings; convert to numeric  
+#* Total_runs_Stroop_Off2/3: for id 66 and 68, switched runs and times values apparently recorded in wrong columns  
+#* For id 12, 31, 66, Total_runs_StroopOn/Off/1/2/3 consistently  less than 5.  Presumed all times are for one run only.  #Replaced by value times 5 and set all number of runs to 5.  [Revisit later]
+
+#Rationalization where there are redundancies in data:  
+
+#* distraction1/2/3 with level1/2/3 (errors that could not be corrected noted below)  
+#* check if calculated difference between OnTime and OffTime is greater than entered difference (>.0011 discrepancy)  [For now, will go with entered difference]
+
+#Unresolved issues:
+
+#* level1/2/3 versus distraction 1/2/3, consistence in auditory distraction levels:   
+# + subject 48 specified control/classical/lyrics but then has level1/2/3=control/lyrics/classical  
+# + subject 68 specified lyrics/classical/control but then has level1/2/3=control/lyrics/classical  
+#* 13 cases with calculated difference between OnTime and OffTime is greater than calculated difference (>.0011 discrepancy); see tables above
+#* For id 12, 31, 66, Total_runs_StroopOn/Off/1/2/3 consistently  less than 5.
+  
+
+
+# Write versions of clean data -- long and wide
+
+
+data1 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level1, sleep1, start_time1_hour, OffTime1, OnTime1, Total_runs_Stroop_Off1, Total_runs_Stroop_On1, OnTime_minus_OffTime1) %>%
+  mutate(order = 1);
+
+data2 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level2, sleep2, start_time2_hour, OffTime2, OnTime2, Total_runs_Stroop_Off2, Total_runs_Stroop_On2, OnTime_minus_OffTime2) %>%
+  mutate(order = 2);
+
+data3 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level3, sleep3, start_time3_hour, OffTime3, OnTime3, Total_runs_Stroop_Off3, Total_runs_Stroop_On3, OnTime_minus_OffTime3) %>%
+  mutate(order = 3);
+
+
+names(data1)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data2)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data3)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+
+longdata <- rbind(data1, data2, data3)
+
+longdata <- longdata %>% mutate(distraction_level = factor(distraction_level, levels=c("control", "classical", "lyrics")))
+
+longdata <- longdata %>% arrange(id, order)
+
+
+
+write.csv(longdata, "cleandata_long.csv", row.names=F)
+write.csv(widedata, "cleandata_wide.csv", row.names=F)
+
+```
+
+According to Figure 1 
+There is differences between distraction levels, so we obtained the model statistics as following:
+
+
+```{r distraction boxplot,echo=FALSE, warning=FALSE}
+ggplot(data = longdata) +
+  geom_boxplot(mapping = aes(x = longdata$distraction_level, y = OnTime_minus_OffTime,fill=distraction_level))+
+               xlab("Three different auditory distraction levels")+ 
+               ylab("The performance of cognitive flexibiity")+
+               ggtitle("Figure 1.The cognitive flexibility performance under three distraction levels")
+```
+
+
+From figure 1, we observed that the “quiet” distraction level has the widest interquartile range, as well as the highest median. In contrast, the classical distraction level has the lowest median. The distraction level “Lyrics”, had the second lowest median while it had the smallest maximum values among three distraction levels despite the outliers. Conclusively, there are some potential effects that auditory levels have on cognitive flexibility.
+
+
+
+
+
+some statistc summary for model 1 
+```{r model 1 ,echo=FALSE, warning=FALSE}
+model_1<-lme(OnTime_minus_OffTime~(distraction_level) +factor(order),random=~1|id,data=longdata)
+anova(model_1)
+```
+
+
+
+
+Check the model_1 assumptions: 
+
+
+```{r,echo=FALSE, warning=FALSE}
+plot(model_1)
+qqnorm(model_1)
+```
+
+We tested the model assumptions: linearity, the normality of residuals and homoscedasticity of residuals. Then we found that on the plot of residuals versus fitted values, the most fitted values were clustered around 5 to 10, while some outliers were between 10 to 20. We decided to omit these outliers and refitted the model, resulting in the new model meeting all the model assumptions better than the old one.
+
+
+
+### Removing outliers and justification 
+
+After removing the outliers, we regraphed an boxplot, fitted the model and checked the model assumptions: 
+```{r,echo=FALSE, warning=FALSE}
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
+H <- 1.5 * IQR(x, na.rm = na.rm)
+y <- x
+y[x < (qnt[1] - H)] <- NA
+y[x > (qnt[2] + H)] <- NA
+y
+}
+longdata$OnTime_minus_OffTime <-remove_outliers(longdata$OnTime_minus_OffTime)
+
+
+
+ggplot(data = longdata) +
+  geom_boxplot(mapping = aes(x = longdata$distraction_level, y = OnTime_minus_OffTime,fill=distraction_level))+
+               xlab("Three different auditory distraction levels")+ 
+               ylab("The performance of cognitive flexibiity")+
+               ggtitle("The cognitive flexibility for distraction levels after omitting outliers")
+model_1.2<-lme(OnTime_minus_OffTime~distraction_level +factor(order),random=~1|id,data=longdata,na.action = na.exclude)
+
+```
+
+
+some statistc summary for model 1 after removing outliers.
+```{r,echo=FALSE, warning=FALSE}
+anova(model_1.2)
+
+plot(model_1.2)
+qqnorm(residuals(model_1.2))
+
+```
+
+
+
+
+
+
+We tested the model assumption which was linearity, the normality of residuals and homoscedasticity of residuals. After omitting 16 outliers, our model met all the assumptions. 
+Even though we lost some degree of freedom and had a wider confidence interval after omitting the outliers, it was necessary to omit them and improve the model’s accuracy. For a model with 216 observations, omitting 16 outliers was deemed acceptable.
+
+
+
+
+## Model_2  with “ Distraction Level” and “ Order”, and the interaction term between them  as Predictor Variables And a Random Effect for each subject: 
+
+### \(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+b_i+e_{ij}\)
+
+
+
+```{r,echo=FALSE, warning=FALSE}
+model_2<-lme(OnTime_minus_OffTime~distraction_level*factor(order),random=~1|id,data=longdata,na.action = na.omit)
+```
+
+The likelihood ratio test for model 1 and model 2
+```{r,echo=FALSE, warning=FALSE}
+lmtest::lrtest(model_1.2,model_2)
+```
+From the likelihood ratio tests, these interaction terms are necessary and useful since p-value is smaller than 0.05.
+
+
+## Model_3  is Model_2  with  Six More Potential Covariates : 
+
+some statistical results for model 3 as well as its model assumptions: 
+```{r,echo=FALSE, warning=FALSE}
+model_3<-lme(OnTime_minus_OffTime~device+yrs_english+video_games+headphones+sleep+start_time+distraction_level*factor(order),random=~1|id,data=longdata,na.action = na.omit)
+anova(model_3)
+plot(model_3)
+
+```
+
+
+
+
+
+Two Likelihood tests for testing whether headphones and devices are useful covariates in the model: 
+
+
+```{r,echo=FALSE, warning=FALSE,include=FALSE}
+model_3.1<-lme(OnTime_minus_OffTime~headphones+distraction_level*factor(order),random=~1|id,data=longdata,na.action = na.omit)
+lmtest::lrtest(model_3.1,model_3)
+
+model_3.2<-lme(OnTime_minus_OffTime~device+headphones+distraction_level*factor(order),random=~1|id,data=longdata,na.action = na.omit)
+
+lmtest::lrtest(model_3.1,model_3.2)
+```
+
+
+## Model_4with “ Distraction Level” and “ Order”, and the interaction term between them  as Predictor Variables, a Random Effect for each subject and a type of earphone variable: 
+
+\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+\beta_9I_{In ear: No Noise Cancelling }+\beta_10I_{Over ear: No Noise Cancelling }+\beta_11I_{Over ear: Yes Noise Cancelling }+b_i+e_{ij}\)
+
+```{r,echo=FALSE, warning=FALSE}
+model_4<-lme(OnTime_minus_OffTime~headphones+distraction_level*factor(order),random=~1|id,data=longdata,na.action = na.omit)
+
+anova(model_4)
+
+```
+
+
+
+Checking the assumption for this chosen model. 
+We tested the model assumption which was linearity, the normality, homoscedasticity of residuals and independence.
+
+From residual versus fitted plot: 
+
+1. The residuals "bounce randomly" around the 0 line. This suggests that the assumption that the linearity is reasonable.
+2. The residuals roughly form a "horizontal band" around the 0 line. This suggests that the variances of the error terms are equal.
+3. No one residual "stands out" from the basic random pattern of residuals. This suggests that there are no outliers.
+our model met all the assumptions. 
+
+From the Normal QQ plot: 
+
+since it's roughly a linear straight line, the assumption of nomality is satisfied. 
+
+Also, since the sample of each individual is independent from each other, so the assumption of independence is satisfied.
+
+```{r,echo=FALSE, warning=FALSE}
+plot(model_4)
+qqnorm(model_4)
+```
+
+```{r,echo=FALSE, warning=FALSE}
+Pmisc::lmeTable(model_4)
+```
+
+# Discussion: 
+1. Though the order was randomly chosen by the subjects, most individuals chose the quiet level as their first auditory distraction level, leaving the other two distractions levels for second or third. This may affect the accuracy of the cognitive flexibility measurements, since people tend to get better at the Stroop test with more practice. The widest range of this quiet level (as shown in figure 1) implies this limitation as well. 
+2. Since the condition of “Quiet“ is very subjective without any official noises tests. The participants are not guaranteed to have participated in the test under the exact same noise conditions.
+
+# Conclusion: 
+From our final model, the average time difference between the on and off Stroop test for a subject under quiet background noise with in-ear and noise cancelling earphones was around 6.47 seconds. In general, the earphones with noise cancelling resulted in lower time differences than the earphones that did not cancel noises. Moreover, we found that the average time differences were smaller for order two and order three. This phenomenon proved our hypothesis that subjects performed better on this test with more trials. Subjects had lower time differences when classical music was chosen as their second test or third test to complete, which suggests that listening to classical music results in higher cognitive flexibility than  under the quiet condition. In addition, we found that listening to music with lyrics as the second or third test will result in higher value of time differences, which implies lower cognitive flexibility.
+
+
+# Appendix
+```{r,echo=FALSE, warning=FALSE}
+ggplot(data = longdata) +
+  geom_boxplot(mapping = aes(x = as.factor(longdata$order), y = OnTime_minus_OffTime,fill=as.factor(order)))+
+               xlab("Three different orders")+ 
+               ylab("The performance of cognitive flexibiity")+
+               ggtitle("Figure 2. The cognitive flexibility performance under three different orders")
+par(mfrow=c(1,2))
+ggplot(data = data1) +
+  geom_bar(mapping = aes(x = as.factor(data1$distraction_level), ,fill=as.factor(distraction_level)))+
+  xlab("three distraction levels ")+
+  ylab("number of people who choose this distraction level")+
+  ggtitle("Figure 3.1 number of people who choose each distraction level as as their first test ")
+
+ggplot(data = data2) +
+  geom_bar(mapping = aes(x = as.factor(data2$distraction_level), ,fill=as.factor(distraction_level)))+
+  xlab(" three distraction levels ")+
+  ylab(" number of people who choose this distraction level")+
+  ggtitle("Figure 3.2 number of people who choose each distraction level as as their second test ")
+
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = as.factor(data3$distraction_level), ,fill=as.factor(distraction_level)))+
+  xlab("three distraction levels ")+
+  ylab("number of people who choose this distraction level")+
+  ggtitle("Figure 3.3 number of people who choose each distraction level as as their third test ")
+```
+
+
+
+# Reference 
+Braem, S., & Egner, T. (2018). Getting a Grip on Cognitive Flexibility. Current Directions in Psychological Science, 27(6), 470–476. https://doi.org/10.1177/0963721418787475

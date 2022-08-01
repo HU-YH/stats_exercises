@@ -1,0 +1,24 @@
+---
+title: "Statistical analysis oral"
+author: "Yuhan Hu"
+date: "2019/10/20"
+output: pdf_document
+---
+
+# Variable choice
+
+Color_blind not included
+
+ON_run not included
+
+off_run not included
+
+Start_time not included: increase flexibility of the model but may capture too much noise due to $\epsilon^2$. i.e. it's obvious effect of starttime is correlated with **MEQ**, since we do not measure **MEQ**
+
+video_games not included: no obvious differences between two groups
+
+On_time
+
+Off_time
+
+we are interested in change between these two value, ie ratio, difference. Not the value themselves

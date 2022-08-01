@@ -1,0 +1,217 @@
+"id","color_blind","yrs_english","video_games","device","headphones","order_of_levels","distraction_level","sleep","start_time","OffTime","OnTime","Total_runs_Stroop_Off","Total_runs_Stroop_On","OnTime_minus_OffTime","order"
+1,"No",12,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"afternoon",47.379,50.003,6,7,2.624,1
+1,"No",12,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"afternoon",46.169,48.313,5,5,2.144,2
+1,"No",12,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"afternoon",44.765,45.911,6,7,1.146,3
+2,"No",7,"No","Android phone","In-ear headphones; not noise cancelling","","control",8,"morning",61.675,74.913,5,5,13.238,1
+2,"No",7,"No","Android phone","In-ear headphones; not noise cancelling","","classical",8,"morning",64.676,64.676,6,6,25.934,2
+2,"No",7,"No","Android phone","In-ear headphones; not noise cancelling","","lyrics",8,"morning",70.651,82.432,6,7,11.781,3
+3,"No",4,"No","iPhone / iPod","Over-ear headphones; noise cancelling","","control",9,"afternoon",75.542,82.57,5,5,7.028,1
+3,"No",4,"No","iPhone / iPod","Over-ear headphones; noise cancelling","","lyrics",9,"afternoon",79.855,88.525,5,5,8.67,2
+3,"No",4,"No","iPhone / iPod","Over-ear headphones; noise cancelling","","classical",8,"afternoon",77.63,83.015,5,5,5.385,3
+4,"No",5,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"morning",62.823,75.34,5,5,12.518,1
+4,"No",5,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"morning",65.072,75.898,6,5,10.826,2
+4,"No",5,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"morning",64.517,73.342,5,6,8.825,3
+5,"No",18,"No","Android phone","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"morning",48.707,61.569,5,5,12.862,1
+5,"No",18,"No","Android phone","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"morning",50.179,54.965,5,5,4.786,2
+5,"No",18,"No","Android phone","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"morning",47.539,55.176,5,5,7.637,3
+6,"No",4,"Yes","iPhone / iPod","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",7,"afternoon",55.982,65.715,5,5,9.733,1
+6,"No",4,"Yes","iPhone / iPod","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",7,"afternoon",54.149,58.828,6,5,4.679,2
+6,"No",4,"Yes","iPhone / iPod","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",7,"afternoon",54.655,63.137,6,5,8.482,3
+7,"No",17,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","control",7,"afternoon",40.78,44.449,16,21,3.67,1
+7,"No",17,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","classical",7,"afternoon",44.229,45.964,14,16,1.735,2
+7,"No",17,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","lyrics",7,"afternoon",38.798,42.046,10,9,3.248,3
+8,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",10,"morning",54.597,73.384,5,5,18.787,1
+8,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",10,"morning",58.037,66.203,5,6,8.166,2
+8,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",10,"morning",57.47,65.333,5,5,7.863,3
+9,"Yes",3,"Yes","iPad tablet","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"morning",65.122,64.081,8,5,-1.041,1
+9,"Yes",3,"Yes","iPad tablet","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"morning",59.274,63.402,6,7,4.128,2
+9,"Yes",3,"Yes","iPad tablet","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"morning",64.517,61.536,5,6,-2.981,3
+10,"No",5,"No","iPad tablet","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",7,"afternoon",59.321,68.984,5,5,9.663,1
+10,"No",5,"No","iPad tablet","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",7,"afternoon",57.499,60.073,5,5,2.574,2
+10,"No",5,"No","iPad tablet","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",7,"afternoon",57.778,62.856,6,6,5.079,3
+11,"No",3,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","classical",10,"afternoon",64.064,79.917,5,5,15.853,1
+11,"No",3,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","lyrics",10,"afternoon",64.075,70.041,5,5,5.966,2
+11,"No",3,"No","iPhone / iPod","Over-ear headphones; noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","control",10,"afternoon",57.744,60.586,5,5,2.842,3
+12,"No",10,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",7,"evening",59.2,68.705,5,5,9.505,1
+12,"No",10,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",7,"evening",60.21,57.56,5,5,-2.65,2
+12,"No",10,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",7,"evening",59.385,60.465,5,5,1.08,3
+13,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",9,"afternoon",52.476,65.214,5,5,12.738,1
+13,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",9,"afternoon",54.443,60.627,5,6,6.183,2
+13,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",9,"afternoon",53.559,52.176,5,6,-1.383,3
+14,"No",12,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","control",7,"afternoon",53.057,49.907,7,5,-3.15,1
+14,"No",12,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",7,"afternoon",50.013,50.883,5,5,0.869,2
+14,"No",12,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",7,"afternoon",47.418,50.625,6,7,3.207,3
+15,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","classical",9,"evening",57.41,60.796,5,7,3.387,1
+15,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","control",9,"evening",55.584,62.405,5,5,6.821,2
+15,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",9,"evening",54.826,58.455,5,5,3.628,3
+16,"No",8,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"afternoon",70.689,90.378,5,5,19.689,1
+16,"No",8,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"afternoon",74.808,83.99,5,5,9.182,2
+16,"No",8,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"afternoon",74.808,83.99,5,5,9.182,3
+17,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","","control",8,"evening",49.166,55.254,5,5,6.088,1
+17,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","","classical",8,"evening",51.532,54.891,5,5,3.359,2
+17,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","","lyrics",8,"evening",46.468,49.934,5,5,3.466,3
+18,"No",7,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7.5,"evening",58.41,68.398,5,5,9.988,1
+18,"No",7,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7.5,"evening",56.341,64.575,5,5,8.234,2
+18,"No",7,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7.5,"evening",58.102,62.024,5,5,3.922,3
+19,"No",8,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","classical",9.5,"afternoon",46.513,46.738,5,6,0.225,1
+19,"No",8,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","control",9.5,"afternoon",38.728,46.292,7,6,11.564,2
+19,"No",8,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",9.5,"afternoon",43.108,38.584,5,5,-4.524,3
+20,"No",16,"No","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"evening",58.707,60.834,5,5,2.127,1
+20,"No",16,"No","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"evening",51.562,55.042,5,5,3.48,2
+20,"No",16,"No","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"evening",48.819,48.725,5,5,-0.094,3
+21,"No",5,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"afternoon",64.422,68.845,5,5,4.422,1
+21,"No",5,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"afternoon",70.973,74.591,5,5,3.618,2
+21,"No",5,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"afternoon",62.503,66.603,5,5,4.1,3
+22,"No",19,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"evening",44.871,54.092,5,6,9.221,1
+22,"No",19,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"evening",42.52,50.446,5,6,7.926,2
+22,"No",19,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"evening",46.416,51.818,6,6,5.402,3
+23,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",8,"evening",48.333,50.329,11,8,1.996,1
+23,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",8,"evening",49.112,49.967,6,7,0.855,2
+23,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",8,"evening",47.351,47.836,5,5,0.484,3
+24,"No",15,"No","iPad tablet","Over-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",6,"evening",53.592,56.983,7,11,3.391,1
+24,"No",15,"No","iPad tablet","Over-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",6,"evening",55.44,60.68,11,6,5.241,2
+24,"No",15,"No","iPad tablet","Over-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",6,"afternoon",52.866,57.312,7,11,4.447,3
+25,"No",5,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","control",10,"evening",56.938,60.618,11,10,3.68,1
+25,"No",5,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",10,"morning",51.24,52.274,7,10,1.034,2
+25,"No",5,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",10,"evening",49.983,52.905,5,6,2.922,3
+26,"No",4,"Yes","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"evening",57.557,65.089,7,6,7.532,1
+26,"No",4,"Yes","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"evening",58.263,55.857,5,5,-2.407,2
+26,"No",4,"Yes","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"evening",57.245,63.957,5,7,6.713,3
+27,"No",5,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",7,"morning",50.69,58.225,5,9,7.536,1
+27,"No",5,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",7,"morning",57.703,61.188,5,8,3.485,2
+27,"No",5,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",7,"morning",59.66,66.343,6,11,6.683,3
+28,"No",7,"Yes","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",5.5,"evening",59.355,68.949,5,5,9.594,1
+28,"No",7,"Yes","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",5.5,"evening",57.37,58.717,5,5,1.347,2
+28,"No",7,"Yes","Android phone","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",5.5,"evening",54.17,62.17,5,5,8,3
+29,"No",6,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"evening",44.934,48.164,9,7,3.23,1
+29,"No",6,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"morning",41.127,43.698,8,9,2.57,2
+29,"No",6,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"morning",39.285,45.737,6,5,6.452,3
+30,"No",17,"No","iPad tablet","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",7,"morning",43.034,49.521,5,5,6.487,1
+30,"No",17,"No","iPad tablet","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",7,"morning",43.178,44.558,6,5,1.388,2
+30,"No",17,"No","iPad tablet","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",7,"morning",41.26,43.353,5,5,2.094,3
+31,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",6,"evening",60,90,5,5,30,1
+31,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",6,"evening",70,90,5,5,20,2
+31,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",6,"evening",75,95,5,5,20,3
+32,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","","control",8,"morning",65.914,82.242,5,5,16.328,1
+32,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","","classical",8,"morning",67.873,72.201,7,5,4.329,2
+32,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","","lyrics",8,"morning",65.844,85.561,5,6,19.717,3
+33,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"afternoon",58.646,72.688,5,6,14.043,1
+33,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"afternoon",60.809,66.892,6,7,6.082,2
+33,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"afternoon",59.48,61.53,6,5,2.05,3
+34,"No",6,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",6,"evening",59.428,65.819,5,6,6.387,1
+34,"No",6,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",6,"evening",56.561,63.715,5,5,7.154,2
+34,"No",6,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",6,"evening",55.465,61.847,5,5,6.382,3
+35,"No",8,"Yes","Android phone","In-ear headphones; noise cancelling","","control",8,"afternoon",63.775,86.652,6,8,22.877,1
+35,"No",8,"Yes","Android phone","In-ear headphones; noise cancelling","","lyrics",8,"afternoon",58.253,76.497,5,5,18.244,2
+35,"No",8,"Yes","Android phone","In-ear headphones; noise cancelling","","classical",8,"afternoon",55.039,72.708,7,5,17.669,3
+36,"No",16,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"evening",66.446,72.914,6,6,6.467,1
+36,"No",16,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"evening",58.412,74.849,8,7,16.436,2
+36,"No",16,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"evening",61.265,64.047,7,6,2.782,3
+37,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"afternoon",61.042,62.32,7,5,1.278,1
+37,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"afternoon",60.624,66.755,5,7,6.131,2
+37,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"afternoon",67.178,65.705,5,6,-1.473,3
+38,"No",7,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",10,"afternoon",43.112,49.378,6,8,6.267,1
+38,"No",7,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",10,"afternoon",42.012,43.625,7,7,1.613,2
+38,"No",7,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",10,"afternoon",43.133,43.771,5,7,0.637,3
+39,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"evening",53.16,66.096,5,5,12.936,1
+39,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"evening",51.967,67.324,5,6,15.356,2
+39,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"evening",48.698,56.265,5,5,7.568,3
+40,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","lyrics",8.5,"evening",62.703,63.815,5,6,1.111,1
+40,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","control",8.5,"evening",59.879,66.752,5,5,6.873,2
+40,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","classical",8.5,"evening",61.35,63.202,5,5,1.852,3
+41,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"morning",57.096,73.209,5,6,16.113,1
+41,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"morning",72.522,76.608,6,5,4.086,2
+41,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"morning",63.52,71.39,5,5,7.87,3
+42,"No",4,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",12,"evening",59.135,73.403,5,5,14.268,1
+42,"No",4,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",12,"evening",57.638,65.235,5,5,7.592,2
+42,"No",4,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",12,"evening",57.71,69.637,5,5,11.927,3
+43,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"evening",62.085,76.32,5,5,14.235,1
+43,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"evening",62.45,65.634,5,5,3.184,2
+43,"No",7,"No","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"evening",56.9,64.779,5,5,7.878,3
+44,"No",7,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","","control",6,"afternoon",46.323,51.817,6,6,5.494,1
+44,"No",7,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","","lyrics",6,"afternoon",43.001,47.8,7,5,4.8,2
+44,"No",7,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","","classical",6,"afternoon",42.406,51.447,5,5,9.041,3
+45,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"evening",47.726,50.895,6,6,3.17,1
+45,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"evening",47.448,53.969,5,6,6.521,2
+45,"No",3,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"evening",45.983,48.044,6,6,2.061,3
+46,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",8,"evening",50.503,60.853,8,5,10.35,1
+46,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",8,"evening",49.129,61.407,6,5,12.277,2
+46,"No",7,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",8,"evening",50.121,54.166,5,8,4.045,3
+47,"No",14,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",9,"morning",60.596,56.876,6,7,-3.72,1
+47,"No",14,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",9,"morning",55.827,63.426,5,9,7.599,2
+47,"No",14,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",9,"morning",50.972,59.825,6,5,8.853,3
+48,"No",4,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"evening",56.101,62.819,9,7,6.718,1
+48,"No",4,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"evening",53.515,62.697,8,9,9.182,2
+48,"No",4,"No","iPhone / iPod","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"evening",55.162,59.435,7,6,4.274,3
+49,"No",10,"Yes","Android phone","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","lyrics",5,"evening",60.755,74.557,5,5,13.802,1
+49,"No",10,"Yes","Android phone","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","control",5,"afternoon",62.438,75.747,5,5,13.309,2
+49,"No",10,"Yes","Android phone","Over-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","classical",5,"evening",65.292,73.546,5,5,8.254,3
+50,"No",4,"No","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",7,"evening",58.931,82.433,5,5,23.502,1
+50,"No",4,"No","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",7,"evening",68.291,86.641,5,5,18.35,2
+50,"No",4,"No","iPad tablet","Over-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",7,"evening",64.307,69.609,5,5,5.303,3
+51,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","classical",7,"evening",61.011,68.933,7,11,7.922,1
+51,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","lyrics",5,"morning",60.08,63.202,7,6,3.121,2
+51,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);","control",7,"evening",56.05,62.18,7,6,6.131,3
+52,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"evening",64.646,68.636,5,5,3.992,1
+52,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"evening",65.343,70.544,5,5,5.201,2
+52,"No",4,"No","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"evening",65.637,69.957,5,5,4.32,3
+53,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"afternoon",55.64,64.575,6,5,8.935,1
+53,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"afternoon",51.421,53.795,5,6,2.374,2
+53,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"afternoon",52.127,63.934,5,5,11.807,3
+54,"No",6,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",10,"evening",64.852,60.342,5,5,-4.51,1
+54,"No",6,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",10,"evening",64.789,67.472,5,5,2.683,2
+54,"No",6,"Yes","iPhone / iPod","In-ear headphones; noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",10,"evening",59.323,60.446,5,6,1.123,3
+55,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",7,"afternoon",62.161,78.418,5,5,16.257,1
+55,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",7,"afternoon",60.98,86.616,5,6,25.636,2
+55,"No",12,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",7,"afternoon",68.801,78.9,5,6,10.099,3
+56,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",7,"morning",52.937,72.799,6,5,19.863,1
+56,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",7,"morning",64.355,65.455,5,6,1.1,2
+56,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",7,"morning",52.983,61.05,5,5,8.067,3
+57,"No",8,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","control",6,"afternoon",49,52.736,8,6,2.836,1
+57,"No",8,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",6,"afternoon",42.085,42.732,5,6,0.648,2
+57,"No",8,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",6,"afternoon",43.058,52.059,6,11,9.002,3
+58,"No",4,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",7,"evening",53.561,55.167,9,5,1.606,1
+58,"No",4,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",7,"evening",48.986,59.549,9,9,10.563,2
+58,"No",4,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",7,"evening",48.6,63.107,5,5,14.507,3
+59,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",8,"afternoon",51.108,57.302,8,6,6.193,1
+59,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",8,"afternoon",45.032,50.686,5,5,5.653,2
+59,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",8,"afternoon",46.593,45.332,5,6,-1.261,3
+60,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",9,"afternoon",64.282,67.526,5,5,3.244,1
+60,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",9,"afternoon",62.878,74.753,5,6,11.875,2
+60,"No",6,"No","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",9,"afternoon",59.464,67.308,5,7,7.844,3
+61,"No",18,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","control",6,"afternoon",47.787,52.47,5,5,4.683,1
+61,"No",18,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","classical",6,"afternoon",43.332,47.893,6,6,4.561,2
+61,"No",18,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","","lyrics",6,"afternoon",43.393,50.888,5,5,7.495,3
+62,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","control",9,"afternoon",63.706,62.831,5,8,-0.875,1
+62,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","classical",9,"afternoon",58.762,62.393,5,7,3.631,2
+62,"No",6,"No","iPhone / iPod","In-ear headphones; not noise cancelling","","lyrics",9,"afternoon",58.441,70.672,5,5,12.231,3
+63,"No",4,"Yes","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","lyrics",6,"morning",53.741,58.63,5,5,4.889,1
+63,"No",4,"Yes","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","control",6,"morning",51.668,55.224,5,5,3.556,2
+63,"No",4,"Yes","Android phone","In-ear headphones; not noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Control (quiet);Classical (Mozart);","classical",6,"morning",46.927,52.892,5,5,5.965,3
+64,"No",15,"No","iPhone / iPod","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",7,"afternoon",54.925,71.675,5,6,16.75,1
+64,"No",15,"No","iPhone / iPod","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",7,"evening",61.895,63.709,6,5,1.814,2
+64,"No",15,"No","iPhone / iPod","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",9,"morning",55.649,68.191,5,5,12.543,3
+65,"No",16,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",9,"evening",60.732,68.133,6,8,7.401,1
+65,"No",16,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",9,"evening",55.163,61.198,7,6,6.035,2
+65,"No",16,"Yes","iPad tablet","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",9,"evening",50.501,60.396,6,8,9.895,3
+66,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","control",7,"evening",55.635,64.715,5,5,9.08,1
+66,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","classical",7,"afternoon",57.885,61.71,5,5,3.825,2
+66,"No",15,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Classical (Mozart);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",7,"afternoon",60.71,60.32,5,5,-0.389999999999993,3
+67,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",9,"afternoon",62.486,69.903,5,6,7.417,1
+67,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",9,"afternoon",55.643,67.244,5,5,11.601,2
+67,"No",6,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",9,"afternoon",56.125,62.655,5,5,6.53,3
+68,"No",4,"Yes","iPad tablet","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","control",6,"afternoon",46.423,51.247,9,5,4.824,1
+68,"No",4,"Yes","iPad tablet","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","lyrics",6,"afternoon",44.28,40.749,5,5,-3.532,2
+68,"No",4,"Yes","iPad tablet","In-ear headphones; noise cancelling","Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);Control (quiet);","classical",6,"afternoon",40.698,44.014,7,6,3.316,3
+69,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","classical",8,"evening",60.174,72.374,5,5,12.2,1
+69,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","control",8,"evening",61.929,61.739,5,5,-0.19,2
+69,"No",4,"No","iPhone / iPod","In-ear headphones; not noise cancelling","Classical (Mozart);Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);","lyrics",8,"evening",58.824,66.793,5,5,7.969,3
+70,"No",17,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",6,"evening",48.742,55.761,5,5,7.019,1
+70,"No",17,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",6,"morning",45.96,53.425,5,5,7.465,2
+70,"No",17,"Yes","iPhone / iPod","In-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",6,"morning",46.507,52.875,5,5,6.368,3
+71,"No",4,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",8,"evening",51.193,57.235,5,7,6.042,1
+71,"No",4,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"afternoon",47.983,56.477,8,9,8.494,2
+71,"No",4,"Yes","iPhone / iPod","Over-ear headphones; noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"afternoon",46.76,51.594,6,7,4.834,3
+72,"No",18,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","control",9,"evening",54.248,70.825,5,5,16.577,1
+72,"No",18,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","lyrics",8,"morning",52.843,74.112,5,6,21.269,2
+72,"No",18,"Yes","Android phone","Over-ear headphones; not noise cancelling","Control (quiet);Song with lyrics (Shape of You by Ed Sheeran);Classical (Mozart);","classical",8,"morning",49.804,73.3,6,5,23.496,3

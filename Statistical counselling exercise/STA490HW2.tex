@@ -1,0 +1,587 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={The Statistical Analysis Report on The Effect of Auditory distractions on Cognitive Flexibility.},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{The Statistical Analysis Report on The Effect of Auditory distractions
+on Cognitive Flexibility.}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+\hypertarget{abstract}{%
+\section{Abstract:}\label{abstract}}
+
+From this report, we found out that general backgroup noises would
+deficit cognitive flexibity,since the earphones with noise cancelling
+resulted in a higher cognitive flexibity than the earphones that did not
+cancel noises.Also,subjects have higher cognitive flexibity in a quiet
+enviroment than listenning to music with lyrics. However,there is an
+exception to classical music, it has higher cognitive flexibility than
+quiet condition.
+
+From our final model, the average time difference between the on and off
+Stroop test for a subject under quiet background noise with in-ear and
+noise cancelling earphones was around 6.47 seconds. In general, the
+earphones with noise cancelling resulted in lower time differences than
+the earphones that did not cancel noises. Moreover, we found that the
+average time differences were smaller for order two and order three.
+This phenomenon proved our hypothesis that subjects performed better on
+this test with more trials. Subjects had lower time differences when
+classical music was chosen as their second test or third test to
+complete, which suggests that listening to classical music results in
+higher cognitive flexibility than under the quiet condition. In
+addition, we found that listening to music with lyrics as the second or
+third test will result in higher value of time differences, which
+implies lower cognitive flexibility.
+
+\hypertarget{introduction}{%
+\section{Introduction:}\label{introduction}}
+
+Cognitive flexibility is the ability of the brain to shift between doing
+different tasks or thinking about different concepts. (Braem and
+Egner,2018). In our research, we are investigating whether the auditory
+distractions will have an effect on cognitive flexibility. In order to
+capture cognitive flexibility, each individual completed three sets of
+stroop tests through an app on their electronic devices. During each
+test, the respondent was required to identify what colour of a displayed
+word was written in while this word itself was a noun for color. We
+replicated this process under three different auditory stimulus.
+
+The objective of this statistical analysis is to use appropriate
+statistical methods and select a model to test the effects of auditory
+distractions on cognitive flexibility. Given in the experiment, there
+are two important explanatory variables: distraction levels and the
+order of completing those levels. We also used the interaction term
+between these two variables to see whether the cognitive flexibility
+performance was due the different orders of distraction levels based on
+personal choices. Then, we tested all the remaining covariates in the
+given dataset to see whether they were statistically significant - for
+example, we found that the type of earphones were an important covariate
+in this experiment.
+
+We firstly solved some issues that were found in the exploratory data
+analysis (EDA), and analyzed the effect of order, distraction level and
+the interaction term on the cognitive flexibility performance. We then
+tested model assumptions and dealt with outliers. Later, we interpreted
+the results and started to test covariates into the model. Lastly, we
+included one useful covariate (the type of headphones used) into our
+model.
+
+\hypertarget{method}{%
+\section{Method:}\label{method}}
+
+The first step we did for this report was to address some issues that we
+found in the exploratory data analysis (EDA), such as correcting some
+numbers that some subjects had misplaced. Then our analysis emphasized
+investigating the research question - ``Does auditory distraction affect
+cognitive flexibility''.
+
+\hypertarget{general-settings-in-our-experiment}{%
+\subsection{General settings in our
+experiment:}\label{general-settings-in-our-experiment}}
+
+The tool we used to measure cognitive flexibility is called EncephalApp
+Stroop test. This app has two operational settings - Stroop Off and
+Stroop On tests. Subjects are required to successfully pass five runs of
+a Stroop Off test before they do a Stroop On test. Here, the Stroop Off
+test functions as a practice run, and aims to get subjects more
+familiarized with the app and test. Then subjects do a Stroop On test
+which contains ten stimuli and a mistake will stop the run.
+
+\hypertarget{reasons-for-choosing-ontime_minus_offtime-as-our-response-variable}{%
+\subsection{Reasons for choosing OnTime\_minus\_OffTime as our response
+variable:}\label{reasons-for-choosing-ontime_minus_offtime-as-our-response-variable}}
+
+The difference between the Stroop On test and the Stroop Off test will
+be the direct and isolated measure for a subject's cognitive
+flexibility. (STA490 handout)
+
+\hypertarget{reasons-for-choosing-distraction-levels-as-our-response-variable}{%
+\subsection{Reasons for choosing distraction levels as our response
+variable:}\label{reasons-for-choosing-distraction-levels-as-our-response-variable}}
+
+Each subject was required to complete three sets of Stroop On and Stroop
+Off test under three different levels in order to test whether the
+auditory distractions affect people's cognitive flexibility. One level
+is ``Quiet'' , where subjects were completing the Stroop test with
+earphones but without any background noise or music. Another level was
+``Classical Music'' , where subjects were completing the Stroop test
+while classical instrumental music - Mozart's Piano Sonata No.8 in A
+minor played in the background through the earphones. The last level was
+``Music with Lyrics'', where subjects were completing the Stroop test
+while a song with a vocal component - Shape of You by Ed Sheeran -
+played in the background.
+
+\hypertarget{reasons-for-choosing-order-levels-as-our-response-variable}{%
+\subsection{Reasons for choosing order levels as our response
+variable:}\label{reasons-for-choosing-order-levels-as-our-response-variable}}
+
+The order of each auditory distraction level was chosen randomly by
+participants. This order was included in the results as some subjects
+would complete certain subsequent orders faster than the ones before due
+to gaining familiarity with the test.
+
+\hypertarget{reasons-for-having-a-random-effect-for-each-individual}{%
+\subsection{Reasons for having a random effect for each
+individual:}\label{reasons-for-having-a-random-effect-for-each-individual}}
+
+We recorded three observations for each individual, and these three
+observations were correlated. Also, each individual had different
+cognitive flexibilities to start with. Therefore, we used a random
+effect to capture these individual differences and correlations between
+observations.
+
+\hypertarget{model_1-with-distraction-level-and-order-as-predictor-variables-and-a-random-effect-for-each-subject}{%
+\subsection{Model\_1 with `` Distraction Level'' and `` Order'' as
+Predictor Variables And a Random Effect for each
+subject:}\label{model_1-with-distraction-level-and-order-as-predictor-variables-and-a-random-effect-for-each-subject}}
+
+In this stage of data analysis, we addressed the research question of
+whether or not auditory distraction affected cognitive flexibility.
+First, we plotted the measure of cognitive flexibility (which was the
+time difference between the Stroop On test and the Stroop Off test)
+versus the three different distraction levels to test any potential main
+effect that was caused by this explanatory variables. (as Figure 1)
+
+Then later we fitted the most basic model as following:
+
+\hypertarget{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-b_ie_ij}{%
+\subsubsection{\texorpdfstring{\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ b_i+e_{ij}\)}{Y\_\{i,j\}=\textbackslash beta\_\{0\}\textasciitilde+\textasciitilde\textbackslash beta\_1I\_\{Classical\}\textasciitilde+\textasciitilde\textbackslash beta\_2I\_\{Lyrics\}+\textbackslash beta\_3I\_\{OrderLevel=2\}+\textbackslash beta\_4I\_\{OrderLevel=3\}+ b\_i+e\_\{ij\}}}\label{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-b_ie_ij}}
+
+i stands for each subject(i = 1,2,3,\ldots,72)
+
+j is the number of observations(j = 1,2,3,\ldots,216)
+
+(\beta\_\{0\}) is when subjects choose to have a quiet backgroud
+auditory level as their first distraction level.
+
+Y\_\{ij\} is the difference between On time and Off time, which is the
+direct measure of cognitive flexibility
+
+bi is the random effect,which is the variation among people
+
+eij is the error term
+
+\hypertarget{model_2-with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-and-a-random-effect-for-each-subject}{%
+\subsection{Model\_2 with `` Distraction Level'' and `` Order'', and the
+interaction term between them as Predictor Variables And a Random Effect
+for each
+subject:}\label{model_2-with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-and-a-random-effect-for-each-subject}}
+
+The most important explanatory variable in our model was the distraction
+level which directly answered our research question, followed by the
+order of which we conducted these distraction levels. In order to find
+any interactions that may have existed between the variables, we tested
+the interaction term models with a likelihood ratio test.
+
+\hypertarget{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2b_ie_ij}{%
+\subsubsection{\texorpdfstring{\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+b_i+e_{ij}\)}{Y\_\{i,j\}=\textbackslash beta\_\{0\}\textasciitilde+\textasciitilde\textbackslash beta\_1I\_\{Classical\}\textasciitilde+\textasciitilde\textbackslash beta\_2I\_\{Lyrics\}+\textbackslash beta\_3I\_\{OrderLevel=2\}+\textbackslash beta\_4I\_\{OrderLevel=3\}+ \textbackslash beta\_5I\_\{Classical:OrderLevel=3\}+\textbackslash beta\_6I\_\{Classical:OrderLevel=2\}+\textbackslash beta\_7I\_\{lyrics:OrderLevel=3\}+\textbackslash beta\_8I\_\{lyrics:OrderLevel=2\}+b\_i+e\_\{ij\}}}\label{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2b_ie_ij}}
+
+i stands for each subject(i = 1,2,3,\ldots,72)
+
+j is the number of observations(j = 1,2,3,\ldots,216)
+
+(\beta\_\{0\}) is when subjects choose to have a quiet backgroud
+auditory level as their first distraction level.
+
+Y\_\{ij\} is the difference between On time and Off time, which is the
+direct measure of cognitive flexibility
+
+bi is the random effect,which is the variation among people
+
+eij is the error term
+
+\hypertarget{model_3-is-model_2-with-six-more-potential-covariates}{%
+\subsection{Model\_3 is Model\_2 with Six More Potential Covariates
+:}\label{model_3-is-model_2-with-six-more-potential-covariates}}
+
+We also collected an additional variable of whether or not the
+participating subject was colour-blind. As only one participant stated
+that they were colour blind, and the stroop test relied on
+differentiating colors, we decided not to use this point of data.
+
+There were six potential covariates in our dataset:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Type of headphones used (over-ear or in-ear / noise-cancelling or not
+  noise-cancelling)
+\item
+  Number of years you have studied at an English language institution
+  (including 2019-20)
+\item
+  Whether or not you play video games
+\item
+  Hours of sleep the night before (for each level of auditory
+  distraction)
+\item
+  Time of day (for each level of auditory distraction)
+\item
+  Type of device used for the Stroop test app
+\end{enumerate}
+
+\hypertarget{model_4with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-a-random-effect-for-each-subject-and-a-type-of-earphone-variable}{%
+\subsection{Model\_4with `` Distraction Level'' and `` Order'', and the
+interaction term between them as Predictor Variables, a Random Effect
+for each subject and a type of earphone
+variable:}\label{model_4with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-a-random-effect-for-each-subject-and-a-type-of-earphone-variable}}
+
+After F-Test on these covariates and some likelihood ratio test,we
+included the only useful covariate in to our model. ANd the finalized
+model as following:
+
+\hypertarget{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2beta_9i_in-ear-no-noise-cancelling-beta_10i_over-ear-no-noise-cancelling-beta_11i_over-ear-yes-noise-cancelling-b_ie_ij}{%
+\subsubsection{\texorpdfstring{\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+\beta_9I_{In ear: No Noise Cancelling }+\beta_10I_{Over ear: No Noise Cancelling }+\beta_11I_{Over ear: Yes Noise Cancelling }+b_i+e_{ij}\)}{Y\_\{i,j\}=\textbackslash beta\_\{0\}\textasciitilde+\textasciitilde\textbackslash beta\_1I\_\{Classical\}\textasciitilde+\textasciitilde\textbackslash beta\_2I\_\{Lyrics\}+\textbackslash beta\_3I\_\{OrderLevel=2\}+\textbackslash beta\_4I\_\{OrderLevel=3\}+ \textbackslash beta\_5I\_\{Classical:OrderLevel=3\}+\textbackslash beta\_6I\_\{Classical:OrderLevel=2\}+\textbackslash beta\_7I\_\{lyrics:OrderLevel=3\}+\textbackslash beta\_8I\_\{lyrics:OrderLevel=2\}+\textbackslash beta\_9I\_\{In ear: No Noise Cancelling \}+\textbackslash beta\_10I\_\{Over ear: No Noise Cancelling \}+\textbackslash beta\_11I\_\{Over ear: Yes Noise Cancelling \}+b\_i+e\_\{ij\}}}\label{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2beta_9i_in-ear-no-noise-cancelling-beta_10i_over-ear-no-noise-cancelling-beta_11i_over-ear-yes-noise-cancelling-b_ie_ij}}
+
+\hypertarget{result}{%
+\section{Result:}\label{result}}
+
+\hypertarget{model_1-with-distraction-level-and-order-as-predictor-variables-and-a-random-effect-for-each-subject-1}{%
+\subsection{Model\_1 with `` Distraction Level'' and `` Order'' as
+Predictor Variables And a Random Effect for each
+subject:}\label{model_1-with-distraction-level-and-order-as-predictor-variables-and-a-random-effect-for-each-subject-1}}
+
+According to Figure 1 There is differences between distraction levels,
+so we obtained the model statistics as following:
+
+\includegraphics{STA490HW2_files/figure-latex/distraction boxplot-1.pdf}
+
+From figure 1, we observed that the ``quiet'' distraction level has the
+widest interquartile range, as well as the highest median. In contrast,
+the classical distraction level has the lowest median. The distraction
+level ``Lyrics'', had the second lowest median while it had the smallest
+maximum values among three distraction levels despite the outliers.
+Conclusively, there are some potential effects that auditory levels have
+on cognitive flexibility.
+
+some statistc summary for model 1
+
+\begin{verbatim}
+##                   numDF denDF   F-value p-value
+## (Intercept)           1   140 156.88699  <.0001
+## distraction_level     2   140   3.50431  0.0327
+## factor(order)         2   140   1.87719  0.1568
+\end{verbatim}
+
+Check the model\_1 assumptions:
+
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-1-1.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-1-2.pdf}
+
+We tested the model assumptions: linearity, the normality of residuals
+and homoscedasticity of residuals. Then we found that on the plot of
+residuals versus fitted values, the most fitted values were clustered
+around 5 to 10, while some outliers were between 10 to 20. We decided to
+omit these outliers and refitted the model, resulting in the new model
+meeting all the model assumptions better than the old one.
+
+\hypertarget{removing-outliers-and-justification}{%
+\subsubsection{Removing outliers and
+justification}\label{removing-outliers-and-justification}}
+
+After removing the outliers, we regraphed an boxplot, fitted the model
+and checked the model assumptions:
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+some statistc summary for model 1 after removing outliers.
+
+\begin{verbatim}
+##                   numDF denDF   F-value p-value
+## (Intercept)           1   129 233.43014  <.0001
+## distraction_level     2   129   2.63326  0.0757
+## factor(order)         2   129   1.64903  0.1963
+\end{verbatim}
+
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-3-1.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-3-2.pdf}
+
+We tested the model assumption which was linearity, the normality of
+residuals and homoscedasticity of residuals. After omitting 16 outliers,
+our model met all the assumptions. Even though we lost some degree of
+freedom and had a wider confidence interval after omitting the outliers,
+it was necessary to omit them and improve the model's accuracy. For a
+model with 216 observations, omitting 16 outliers was deemed acceptable.
+
+\hypertarget{model_2-with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-and-a-random-effect-for-each-subject-1}{%
+\subsection{Model\_2 with `` Distraction Level'' and `` Order'', and the
+interaction term between them as Predictor Variables And a Random Effect
+for each
+subject:}\label{model_2-with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-and-a-random-effect-for-each-subject-1}}
+
+\hypertarget{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2b_ie_ij-1}{%
+\subsubsection{\texorpdfstring{\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+b_i+e_{ij}\)}{Y\_\{i,j\}=\textbackslash beta\_\{0\}\textasciitilde+\textasciitilde\textbackslash beta\_1I\_\{Classical\}\textasciitilde+\textasciitilde\textbackslash beta\_2I\_\{Lyrics\}+\textbackslash beta\_3I\_\{OrderLevel=2\}+\textbackslash beta\_4I\_\{OrderLevel=3\}+ \textbackslash beta\_5I\_\{Classical:OrderLevel=3\}+\textbackslash beta\_6I\_\{Classical:OrderLevel=2\}+\textbackslash beta\_7I\_\{lyrics:OrderLevel=3\}+\textbackslash beta\_8I\_\{lyrics:OrderLevel=2\}+b\_i+e\_\{ij\}}}\label{y_ijbeta_0beta_1i_classicalbeta_2i_lyricsbeta_3i_orderlevel2beta_4i_orderlevel3-beta_5i_classicalorderlevel3beta_6i_classicalorderlevel2beta_7i_lyricsorderlevel3beta_8i_lyricsorderlevel2b_ie_ij-1}}
+
+The likelihood ratio test for model 1 and model 2
+
+\begin{verbatim}
+## Likelihood ratio test
+## 
+## Model 1: OnTime_minus_OffTime ~ distraction_level + factor(order)
+## Model 2: OnTime_minus_OffTime ~ distraction_level * factor(order)
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1   7 -599.52                        
+## 2  11 -591.05  4 16.945   0.001981 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+From the likelihood ratio tests, these interaction terms are necessary
+and useful since p-value is smaller than 0.05.
+
+\hypertarget{model_3-is-model_2-with-six-more-potential-covariates-1}{%
+\subsection{Model\_3 is Model\_2 with Six More Potential Covariates
+:}\label{model_3-is-model_2-with-six-more-potential-covariates-1}}
+
+some statistical results for model 3 as well as its model assumptions:
+
+\begin{verbatim}
+##                                 numDF denDF   F-value p-value
+## (Intercept)                         1   122 246.37102  <.0001
+## device                              2    63   3.54159  0.0349
+## yrs_english                         1    63   0.05650  0.8129
+## video_games                         1    63   1.91946  0.1708
+## headphones                          3    63   1.66970  0.1825
+## sleep                               1   122   0.07454  0.7853
+## start_time                          2   122   0.69288  0.5021
+## distraction_level                   2   122   2.68738  0.0721
+## factor(order)                       2   122   1.92564  0.1502
+## distraction_level:factor(order)     4   122   0.90255  0.4648
+\end{verbatim}
+
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+Two Likelihood tests for testing whether headphones and devices are
+useful covariates in the model:
+
+\hypertarget{model_4with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-a-random-effect-for-each-subject-and-a-type-of-earphone-variable-1}{%
+\subsection{Model\_4with `` Distraction Level'' and `` Order'', and the
+interaction term between them as Predictor Variables, a Random Effect
+for each subject and a type of earphone
+variable:}\label{model_4with-distraction-level-and-order-and-the-interaction-term-between-them-as-predictor-variables-a-random-effect-for-each-subject-and-a-type-of-earphone-variable-1}}
+
+\(Y_{i,j}=\beta_{0}~+~\beta_1I_{Classical}~+~\beta_2I_{Lyrics}+\beta_3I_{OrderLevel=2}+\beta_4I_{OrderLevel=3}+ \beta_5I_{Classical:OrderLevel=3}+\beta_6I_{Classical:OrderLevel=2}+\beta_7I_{lyrics:OrderLevel=3}+\beta_8I_{lyrics:OrderLevel=2}+\beta_9I_{In ear: No Noise Cancelling }+\beta_10I_{Over ear: No Noise Cancelling }+\beta_11I_{Over ear: Yes Noise Cancelling }+b_i+e_{ij}\)
+
+\begin{verbatim}
+##                                 numDF denDF   F-value p-value
+## (Intercept)                         1   125 251.15967  <.0001
+## headphones                          3    67   2.91654  0.0405
+## distraction_level                   2   125   2.55225  0.0820
+## factor(order)                       2   125   1.61650  0.2027
+## distraction_level:factor(order)     4   125   0.98177  0.4201
+\end{verbatim}
+
+Checking the assumption for this chosen model. We tested the model
+assumption which was linearity, the normality, homoscedasticity of
+residuals and independence.
+
+From residual versus fitted plot:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The residuals ``bounce randomly'' around the 0 line. This suggests
+  that the assumption that the linearity is reasonable.
+\item
+  The residuals roughly form a ``horizontal band'' around the 0 line.
+  This suggests that the variances of the error terms are equal.
+\item
+  No one residual ``stands out'' from the basic random pattern of
+  residuals. This suggests that there are no outliers. our model met all
+  the assumptions.
+\end{enumerate}
+
+From the Normal QQ plot:
+
+since it's roughly a linear straight line, the assumption of nomality is
+satisfied.
+
+Also, since the sample of each individual is independent from each
+other, so the assumption of independence is satisfied.
+
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-9-2.pdf}
+
+\begin{verbatim}
+##                                                             MLE Std.Error
+## (Intercept)                                          5.66374412  1.177385
+## headphonesIn-ear headphones; not noise cancelling    1.88060130  1.168413
+## headphonesOver-ear headphones; noise cancelling      0.59273973  1.527004
+## headphonesOver-ear headphones; not noise cancelling  4.34001199  1.552306
+## distraction_levelclassical                           2.08750047  1.974138
+## distraction_levellyrics                             -1.14580601  1.588094
+## factor(order)2                                      -0.49168172  1.845204
+## factor(order)3                                      -1.19980948  1.659760
+## distraction_levelclassical:factor(order)2           -4.18730609  2.913373
+## distraction_levellyrics:factor(order)2               0.49228651  2.565003
+## distraction_levelclassical:factor(order)3           -2.49388609  2.689533
+## distraction_levellyrics:factor(order)3              -0.09896269  2.538823
+## $\\sigma$                                            2.21944663        NA
+## $\\tau$                                              4.16699359        NA
+##                                                      DF     t-value
+## (Intercept)                                         125  4.81044485
+## headphonesIn-ear headphones; not noise cancelling    67  1.60953489
+## headphonesOver-ear headphones; noise cancelling      67  0.38817182
+## headphonesOver-ear headphones; not noise cancelling  67  2.79584808
+## distraction_levelclassical                          125  1.05742357
+## distraction_levellyrics                             125 -0.72149753
+## factor(order)2                                      125 -0.26646472
+## factor(order)3                                      125 -0.72288113
+## distraction_levelclassical:factor(order)2           125 -1.43727103
+## distraction_levellyrics:factor(order)2              125  0.19192438
+## distraction_levelclassical:factor(order)3           125 -0.92725605
+## distraction_levellyrics:factor(order)3              125 -0.03897975
+## $\\sigma$                                            NA          NA
+## $\\tau$                                              NA          NA
+##                                                          p-value
+## (Intercept)                                         4.253059e-06
+## headphonesIn-ear headphones; not noise cancelling   1.122015e-01
+## headphonesOver-ear headphones; noise cancelling     6.991195e-01
+## headphonesOver-ear headphones; not noise cancelling 6.747627e-03
+## distraction_levelclassical                          2.923576e-01
+## distraction_levellyrics                             4.719508e-01
+## factor(order)2                                      7.903204e-01
+## factor(order)3                                      4.711033e-01
+## distraction_levelclassical:factor(order)2           1.531395e-01
+## distraction_levellyrics:factor(order)2              8.481129e-01
+## distraction_levelclassical:factor(order)3           3.555805e-01
+## distraction_levellyrics:factor(order)3              9.689687e-01
+## $\\sigma$                                                     NA
+## $\\tau$                                                       NA
+\end{verbatim}
+
+\hypertarget{discussion}{%
+\section{Discussion:}\label{discussion}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Though the order was randomly chosen by the subjects, most individuals
+  chose the quiet level as their first auditory distraction level,
+  leaving the other two distractions levels for second or third. This
+  may affect the accuracy of the cognitive flexibility measurements,
+  since people tend to get better at the Stroop test with more practice.
+  The widest range of this quiet level (as shown in figure 1) implies
+  this limitation as well.
+\item
+  Since the condition of ``Quiet`` is very subjective without any
+  official noises tests. The participants are not guaranteed to have
+  participated in the test under the exact same noise conditions.
+\end{enumerate}
+
+\hypertarget{conclusion}{%
+\section{Conclusion:}\label{conclusion}}
+
+From our final model, the average time difference between the on and off
+Stroop test for a subject under quiet background noise with in-ear and
+noise cancelling earphones was around 6.47 seconds. In general, the
+earphones with noise cancelling resulted in lower time differences than
+the earphones that did not cancel noises. Moreover, we found that the
+average time differences were smaller for order two and order three.
+This phenomenon proved our hypothesis that subjects performed better on
+this test with more trials. Subjects had lower time differences when
+classical music was chosen as their second test or third test to
+complete, which suggests that listening to classical music results in
+higher cognitive flexibility than under the quiet condition. In
+addition, we found that listening to music with lyrics as the second or
+third test will result in higher value of time differences, which
+implies lower cognitive flexibility.
+
+\hypertarget{appendix}{%
+\section{Appendix}\label{appendix}}
+
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-11-2.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-11-3.pdf}
+\includegraphics{STA490HW2_files/figure-latex/unnamed-chunk-11-4.pdf}
+
+\hypertarget{reference}{%
+\section{Reference}\label{reference}}
+
+Braem, S., \& Egner, T. (2018). Getting a Grip on Cognitive Flexibility.
+Current Directions in Psychological Science, 27(6), 470--476.
+\url{https://doi.org/10.1177/0963721418787475}
+
+
+\end{document}

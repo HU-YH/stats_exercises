@@ -1,0 +1,262 @@
+---
+title: "Effect of auditory distraction on cognitive flexibility: Analysis for students"
+author: "Alison Gibbs and Nathalie Moon"
+date: "October 10, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Knitting this document will produce analysis that you should use for your written report.  It includes some decisions that we have made and we would like you to write your report also making these decisions.  You can augment the work here with additional analyses, but you should not substitute other analyses for the work done here.
+
+Note that this analysis is provided without commentary.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r loadpkgs, echo=F, message=F, warning=F}
+library(tidyverse)
+library(readr)
+library(knitr)
+library(nlme)
+library(emmeans)
+```
+
+```{r readdata, echo=F, message=F}
+data <- read_csv("cleandata_long.csv")
+names(data) <- c("id", "cblind", "english", "vgames", "device", "headphones", "alllevels", "distraction", "sleep", "start", "offtime", "ontime", "runsoff", "runson", "diff", "order")
+# check data are read in ok
+glimpse(data) 
+```
+
+
+## Start with model with just distraction
+
+```{r}
+data %>% group_by(distraction) %>% summarize(means = mean(diff))
+
+simple.model <- lme(diff ~ distraction, random=~1|id, method="REML", data=data)
+anova(simple.model)
+plot(simple.model)
+# qq plot of random effects
+qqnorm(simple.model, ~ranef(.), id=0.05, cex=0.7)
+# marginal residuals 
+qqnorm(resid(simple.model, level=0))
+# conditional residuals 
+qqnorm(resid(simple.model,level=1)) 
+```
+
+## Effect of order
+
+```{r}
+data %>%
+  group_by(order, distraction)%>%
+  summarise(n=n())%>%
+  spread(distraction, n) %>%
+  kable()
+
+data %>% group_by(order) %>% summarize(means = mean(diff)) 
+```
+
+```{r}
+data %>% group_by(distraction, order) %>% summarize(means = mean(diff))
+
+# model with order interaction
+simple.model.plus.order <- lme(diff ~ distraction*order, random=~1|id, method="REML", data=data)
+anova(simple.model.plus.order)
+plot(simple.model.plus.order)
+# random effects
+qqnorm(simple.model.plus.order, ~ranef(.), id=0.05, cex=0.7)
+# marginal residuals
+qqnorm(resid(simple.model.plus.order, level=0))
+# conditional residuals 
+qqnorm(resid(simple.model.plus.order,level=1)) 
+# by order
+plot(simple.model.plus.order, resid(., type="p")~fitted(.)|order, id=0.05, adj=-.3)
+
+# remove interaction
+simple.model.plus.order.no.ix <- lme(diff ~ distraction + order, random=~1|id, method="REML", data=data)
+anova(simple.model.plus.order.no.ix)
+plot(simple.model.plus.order.no.ix)
+# random effects
+qqnorm(simple.model.plus.order.no.ix, ~ranef(.), id=0.05, cex=0.7)
+# marginal residuals
+qqnorm(resid(simple.model.plus.order.no.ix, level=0))
+# conditional residuals 
+qqnorm(resid(simple.model.plus.order.no.ix,level=1)) # same as from residuals command
+# by order
+plot(simple.model.plus.order.no.ix, resid(., type="p")~fitted(.)|order, id=0.05, adj=-.3)
+```
+
+
+### Look at correlations between pairs of observations on same subject
+
+```{r, eval=T}
+print('Correlation and Variance-Covariance matrices by distraction')
+cor(cbind(data$diff[data$distraction=="control"],
+data$diff[data$distraction=="lyrics"],
+data$diff[data$distraction=="classical"]))
+
+var(cbind(data$diff[data$distraction=="control"],
+data$diff[data$distraction=="lyrics"],
+data$diff[data$distraction=="classical"]))
+
+print('Correlation and Variance-Covariance matrices by order')
+cor(cbind(data$diff[data$order==1],
+data$diff[data$order==2],
+data$diff[data$order==3]))
+
+var(cbind(data$diff[data$order==1],
+data$diff[data$order==2],
+data$diff[data$order==3]))
+```
+
+
+### Examine whether variance differing with distraction / order gives better fit
+
+```{r}
+# check variance differing with distraction
+model.Vdistraction <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|distraction), method="REML", data=data)
+anova(model.Vdistraction)
+anova(simple.model.plus.order.no.ix, model.Vdistraction)
+
+# check variance differing with order
+model.Vorder <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model.Vorder)
+anova(simple.model.plus.order.no.ix, model.Vorder)
+summary(emmeans(model.Vorder, ~distraction))
+```
+
+
+### Can I get a better fit with UN covariance structure? 
+
+```{r}
+# CS covariance structure, different variances with levels of order
+simple.model.Vcs <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+
+# UN covariance structure,  different variances with levels of order
+simple.model.Vun <- lme(diff ~ distraction + order, random=~1|id,weights=varIdent(form=~1|order), method="REML", data=data, correlation=corSymm())
+
+anova(simple.model.Vcs, simple.model.Vun)
+```
+
+
+## Role of other variables
+
+### colour blind
+Only one colour blind student
+
+### english
+```{r}
+model_en <- lme(diff ~ distraction*english + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_en)
+model_en <- lme(diff ~ distraction + order + english, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_en)
+```
+
+### video games
+```{r}
+model_vg <- lme(diff ~ distraction*vgames + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_vg)
+model_vg <- lme(diff ~ distraction + order + vgames, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_vg)
+```
+
+### device
+```{r}
+model_dv <- lme(diff ~ distraction*device + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_dv)
+model_dv <- lme(diff ~ distraction + order + device, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_dv)
+summary(emmeans(model_dv, ~device))
+```
+
+### headphones
+```{r}
+model_hp <- lme(diff ~ distraction*headphones + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_hp)
+model_hp <- lme(diff ~ distraction + headphones + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_hp)
+summary(emmeans(model_hp, ~headphones))
+```
+
+### hours of sleep
+```{r}
+model_sl <- lme(diff ~ distraction*sleep + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_sl)
+model_sl <- lme(diff ~ distraction + sleep + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_sl)
+```
+
+### start time
+```{r}
+model_start <- lme(diff ~ distraction*start + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_start)
+model_start <- lme(diff ~ distraction + start + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model_start)
+```
+
+
+## Check sensitivity of results to decisions made in data cleaning
+
+### Does one-person with colour-blind make a difference?
+```{r}
+data %>% group_by(cblind) %>% summarize(mean = mean(diff))
+data_ncb <- data %>% filter(cblind=="No")
+model.Vorder.ncb <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data_ncb)
+anova(model.Vorder.ncb)
+summary(emmeans(model.Vorder.ncb, ~distraction))
+```
+
+
+### Examine effect of imputation for people who had fewer than 5 runs
+
+```{r}
+# students 12, 31, 66
+data <- data %>% mutate(runs_error = ifelse(id %in% c(12, 31, 66), 1, 0))
+data %>% group_by(runs_error) %>% summarize(means = mean(diff))
+
+data_nre <- data %>% filter(runs_error==0)
+model.Vorder.nre <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data_nre)
+anova(model.Vorder.nre)
+summary(emmeans(model.Vorder.nre, ~distraction))
+```
+
+
+### Ontime - Offtime discrepancies  
+
+Try fit with calculated value rather than input value.
+```{r}
+data <- data %>% mutate(calc_diff = ontime - offtime)
+model.Vorder.calc <- lme(calc_diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model.Vorder.calc)
+summary(emmeans(model.Vorder, ~distraction))
+```
+
+
+### Check effect of which level when for subjects with discrepancies
+```{r}
+data <- data %>% mutate(alllevels = ifelse(is.na(alllevels), ";;", alllevels))
+
+data <- data %>% mutate(distraction1 = str_split(alllevels, ";", simplify=T)[,1]) %>%
+  mutate(distraction2 = str_split(alllevels, ";", simplify=T)[,2]) %>%
+  mutate(distraction3 = str_split(alllevels, ";", simplify=T)[,3])
+data <- data %>% mutate(distraction1 = ifelse(distraction1 == "Control (quiet)", "control",
+                                ifelse(distraction1 == "Song with lyrics (Shape of You by Ed Sheeran)", "lyrics",
+                                ifelse(distraction1 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction2 = ifelse(distraction2 == "Control (quiet)","control",
+                               ifelse(distraction2 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction2 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction3 = ifelse(distraction3 == "Control (quiet)","control",
+                               ifelse(distraction3 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction3 == "Classical (Mozart)", "classical", "")))  )
+data <- data %>% mutate(newdist = ifelse(order==1, distraction1, ifelse(order==2, distraction2, distraction3)))
+data <- data %>% mutate(newdist = ifelse(newdist == "", distraction, newdist))
+table(data$newdist)
+
+model.Vorder.levels <- lme(diff ~ newdist + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+anova(model.Vorder.levels)
+summary(emmeans(model.Vorder.levels, ~newdist))
+```
+

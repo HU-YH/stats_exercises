@@ -1,0 +1,342 @@
+---
+title: "Sample code for cleaning fall term project data"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(stringr)
+```
+
+
+# Read in data 
+
+Check it was read in ok.
+
+Give variable names I want to use.
+
+```{r, include=F}
+widedata <- read.csv("sta490_cognitive_flexibility_data.csv")
+
+# glimpse(widedata)
+
+# Clean up variable names
+varnames <- c("id","color_blind", "yrs_english", "video_games", "device", "headphones", "order_of_levels", 
+              "level1", "sleep1", "start_time1", "OffTime1", "OnTime1", "Total_runs_Stroop_Off1", 
+              "Total_runs_Stroop_On1", "OnTime_minus_OffTime1", 
+              "level2", "sleep2", "start_time2", "OffTime2", "OnTime2", "Total_runs_Stroop_Off2", 
+              "Total_runs_Stroop_On2", "OnTime_minus_OffTime2", 
+              "level3", "sleep3", "start_time3", "OffTime3", "OnTime3", "Total_runs_Stroop_Off3", 
+              "Total_runs_Stroop_On3", "OnTime_minus_OffTime3",
+              "ID")
+dim(widedata)
+length(varnames)
+
+names(widedata) <- varnames
+
+widedata <- widedata %>% select(-ID)
+dim(widedata)
+
+glimpse(widedata)
+```
+
+Lots of things to clean up.
+
+# Clean up
+
+* Look at variables one at a time and clean up format.
+* Check for internal consistency with order of levels of auditory distraction on difference bettwen Stroop On and Stroop Off times.
+
+```{r, echo=FALSE}
+
+#table(widedata$color_blind) # OK
+
+#table(widedata$yrs_english) # Remove strings, convert to numerics
+widedata <- widedata %>% 
+  mutate(yrs_english = str_trim(str_remove(yrs_english, "years"))) %>%
+  mutate(yrs_english = ifelse(yrs_english=="five", 5, yrs_english)) %>%
+  mutate(yrs_english = as.numeric(yrs_english))
+
+#table(widedata$video_games) # OK
+
+#table(widedata$device)      # OK
+
+#table(widedata$headphones)  # OK
+
+#table(widedata$order_of_levels) # need to split
+widedata <- widedata %>% mutate(distraction1 = str_split(order_of_levels, ";", simplify=T)[,1]) %>%
+  mutate(distraction2 = str_split(order_of_levels, ";", simplify=T)[,2]) %>%
+  mutate(distraction3 = str_split(order_of_levels, ";", simplify=T)[,3])
+widedata <- widedata %>% mutate(distraction1 = ifelse(distraction1 == "Control (quiet)", "control",
+                                ifelse(distraction1 == "Song with lyrics (Shape of You by Ed Sheeran)", "lyrics",
+                                ifelse(distraction1 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction2 = ifelse(distraction2 == "Control (quiet)","control",
+                               ifelse(distraction2 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction2 == "Classical (Mozart)", "classical", ""))) ) %>%
+                         mutate(distraction3 = ifelse(distraction3 == "Control (quiet)","control",
+                               ifelse(distraction3 == "Song with lyrics (Shape of You by Ed Sheeran)","lyrics",
+                               ifelse(distraction3 == "Classical (Mozart)", "classical", "")))  )
+
+#table(widedata$level1)       # Need to clean up labels
+#table(widedata$level2)       # Need to clean up labels
+#table(widedata$level3)       # Need to clean up labels
+
+widedata <- widedata %>% 
+  mutate(level1 = str_to_lower(level1)) %>%
+  mutate(level2 = str_to_lower(level2)) %>%
+  mutate(level3 = str_to_lower(level3))
+
+# Clean up levels
+clean_levels <- function(x){
+  x[str_detect(x, pattern = "quiet")] <- "control"
+  x[str_detect(x, pattern = "quite")] <- "control"
+  x[str_detect(x, pattern = "control")] <- "control"
+  x[str_detect(x, pattern = "silent")] <- "control"
+  x[str_detect(x, pattern = "no musics")] <- "control"
+  
+  x[str_detect(x, pattern = "without lyrics")] <- "classical"
+  x[str_detect(x, pattern = "no lyrics")] <- "classical"
+  
+  x[str_detect(x, pattern = "sheeran")] <- "lyrics"
+  x[str_detect(x, pattern = "sherron")] <- "lyrics"
+  x[str_detect(x, pattern = "shape")] <- "lyrics"
+  x[str_detect(x, pattern = "lyrics")] <- "lyrics"
+  x[str_detect(x, pattern = "lyric")] <- "lyrics"
+  x[str_detect(x, pattern = "song")] <- "lyrics"
+  
+  x[str_detect(x, pattern = "classical")] <- "classical"
+  x[str_detect(x, pattern = "classic")] <- "classical"  
+  x[str_detect(x, pattern = "mozart")] <- "classical"
+  x[str_detect(x, pattern = "instrumental")] <- "classical"
+  return(x)
+}
+
+widedata <- widedata %>% mutate(level1 = clean_levels(level1),
+                          level2 = clean_levels(level2),
+                          level3 = clean_levels(level3))
+
+## Check auditory distraction levels for consistency
+#widedata %>% filter(distraction1 != level1 | distraction2 != level2 | distraction3 != level3) %>% 
+#  filter(order_of_levels != "") %>% 
+#  select(id, distraction1, level1, distraction2, level2, distraction3, level3, 
+#         OnTime_minus_OffTime1, OnTime_minus_OffTime2, OnTime_minus_OffTime3)
+
+#table(widedata$sleep1)       # Need to strip characters, convert to numeric
+#table(widedata$sleep2)
+#table(widedata$sleep3)
+
+# Clean up hrs of sleep
+clean_sleep <- function(x){
+ x <- str_remove(x, "hrs")  
+ x <- str_remove(x, "hours")
+ x <- str_remove(x, "h")
+ x <- str_remove(x, "Hours")
+ x <- str_trim(x)
+ x <- as.numeric(x)
+ return(x)
+}
+
+widedata <- widedata %>% mutate(sleep1 = clean_sleep(sleep1),
+                         sleep2 = clean_sleep(sleep2),
+                         sleep3 = clean_sleep(sleep3))
+
+#table(widedata$start_time1)  # almost 72 different values in different formats
+#table(widedata$start_time2)  # almost 72 different values in different formats
+#table(widedata$start_time3)  # almost 72 different values in different formats
+
+
+# Create variables for nearest hour in 24 hour clock (done by hand from values)
+widedata$start_time1_hour <- c(17, 11, 13, 12, 11, 13, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 17, 20, 14.5, 20.5, 22, 19, 24, 
+                              21, 9, 20, 23, 12, 19, 12, 16, 21, 17, 20, 15, 17, 20, 20, 11, 20, 21, 16, 23, 21, 7, 20, 19, 23, 
+                              22, 19, 18, 22, 14, 12, 14, 24, 17, 13, 18, 18, 11, 16, 20, 23, 16, 16, 20, 23, 20, 23)  
+widedata$start_time2_hour <- c(17, 12, 13.5, 12, 11.5, 14, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 17.5, 20, 15, 21, 22, 19,
+                               12, 21, 9, 22, 12, 12, 20, 12, 16,  21, 17, 19, 15, 17, 20, 20, 11, 20, 21, 16, 23, 21, 7, 20, 18, 23,
+                               9, 19, 18, 20, 14.5, 12, 14, 24, 17, 13, 18, 18, 11, 26, 20, 14, 16, 16, 20, 11, 16, 11)   
+widedata$start_time3_hour <- c(18, 12, 13, 12, 12, 14, 17, 10, 10, 16, 16, 22, 15, 13, 21, 18, 20, 19, 18,  20, 15, 21, 22, 18, 24,
+                               21, 9, 22, 12, 12, 20, 12, 16, 21, 18, 19, 15, 17, 21, 20, 12, 20, 20, 16, 23, 21, 7, 20, 19, 23, 1, 19,
+                               18, 22, 15, 12, 14, 0, 17, 13, 18, 18, 11, 7, 20.5, 15.5, 16, 16, 21, 11, 16, 11)   
+widedata <- widedata %>% select(-c(start_time1, start_time2, start_time3))
+# collapse to morning, afternoon, evening
+widedata <- widedata %>% mutate(start_time1_hour = ifelse(start_time1_hour >= 7 & start_time1_hour <= 12, "morning",
+                                               ifelse(start_time1_hour >=12.5 & start_time1_hour <= 18, "afternoon", "evening")))
+widedata <- widedata %>% mutate(start_time2_hour = ifelse(start_time2_hour >= 7 & start_time2_hour <= 12, "morning",
+                                               ifelse(start_time2_hour >=12.5 & start_time2_hour <= 18, "afternoon", "evening")))
+widedata <- widedata %>% mutate(start_time3_hour = ifelse(start_time3_hour >= 7 & start_time3_hour <= 12, "morning",
+                                               ifelse(start_time3_hour >=12.5 & start_time3_hour <= 18, "afternoon", "evening")))
+
+# outcome variables
+# times
+#table(widedata$OffTime1)     # Convert to numeric; strip characters
+#table(widedata$OffTime2) 
+#table(widedata$OffTime3) 
+#table(widedata$OnTime1)      # Convert to numeric; strip characters
+#table(widedata$OnTime2) 
+#table(widedata$OnTime3) 
+#table(widedata$OnTime_minus_OffTime1)  # convert to numeric; strip characters
+#table(widedata$OnTime_minus_OffTime2)
+#table(widedata$OnTime_minus_OffTime3)
+
+# Clean up response times (OnTime, OffTime, OnTime_minus_OffTime)
+clean_response_times <- function(x){
+  x <- str_remove(x, "s")
+  x <- str_remove(x, "S")
+  x <- str_remove(x, "`")
+  x <- str_trim(x)
+  x <- as.numeric(as.character(x))
+  return(x)
+}
+
+widedata <- widedata %>% mutate(OffTime1 = clean_response_times(OffTime1),
+                         OnTime1 = clean_response_times(OnTime1),
+                         OnTime_minus_OffTime1 = clean_response_times(OnTime_minus_OffTime1),
+                         OffTime2 = clean_response_times(OffTime2),
+                         OnTime2 = clean_response_times(OnTime2),
+                         OnTime_minus_OffTime2 = clean_response_times(OnTime_minus_OffTime2),
+                         OffTime3 = clean_response_times(OffTime3),
+                         OnTime3 = clean_response_times(OnTime3),
+                         OnTime_minus_OffTime3 = clean_response_times(OnTime_minus_OffTime3))
+
+# Check that subtracted times are OnTime_minus_OffTime
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime1 - diff1)) %>%
+  filter(abs(OnTime_minus_OffTime1 - diff1) > .0011) %>%
+  select(id, OnTime1, OffTime1, OnTime_minus_OffTime1, diff1, diffofdiff )
+
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime2 - diff2)) %>%
+  filter(abs(OnTime_minus_OffTime2 - diff2) > .0011) %>%
+  select(id, OnTime2, OffTime2, OnTime_minus_OffTime2, diff2, diffofdiff )
+
+widedata %>% mutate(diff1 = OnTime1 - OffTime1, diff2 = OnTime2 - OffTime2, diff3 = OnTime3 - OffTime3) %>%
+  mutate(diffofdiff = abs(OnTime_minus_OffTime3 - diff3)) %>%
+  filter(abs(OnTime_minus_OffTime3 - diff3) > .0011) %>%
+  select(id, OnTime3, OffTime3, OnTime_minus_OffTime3, diff3, diffofdiff )
+
+#table(widedata$Total_runs_Stroop_Off1) # OK ( weird that some have < 5)
+#table(widedata$Total_runs_Stroop_On1)  # OK ( weird that some have < 5 - may want to filter these out.  Look to see if their times are much shorter
+#table(widedata$Total_runs_Stroop_Off2) 
+#table(widedata$Total_runs_Stroop_On2)
+#table(widedata$Total_runs_Stroop_Off3) 
+#table(widedata$Total_runs_Stroop_On3)
+
+# find value that had Total_runs_Stroop_Off2 == -3.532
+### widedata %>% filter(Total_runs_Stroop_Off2 == -3.532) 
+# id 68, presume switched with runs OnTime_minus_OffTime2 which is 5 and is consistent with OnTime2-OffTime2
+widedata <- widedata %>% mutate(OnTime_minus_OffTime2 = ifelse(id %in% "68", -3.532, OnTime_minus_OffTime2)) %>%
+  mutate(Total_runs_Stroop_Off2 = ifelse(id %in% "68", 5, Total_runs_Stroop_Off2))
+# find value that had Total_runs_Stroop_Off3 == 12.142
+#### widedata %>% filter(Total_runs_Stroop_Off3 == 12.142) 
+# id 66, also OffTime3 is missing, presume it is as follows
+widedata <- widedata %>% mutate(OffTime3 = ifelse(id %in% "66", 12.142, OffTime3)) %>%
+  mutate(Total_runs_Stroop_Off3 = ifelse(id %in% "66", 2, Total_runs_Stroop_Off3)) %>%
+  mutate(OnTime_minus_OffTime3 = ifelse(id %in% "66", OnTime3-OffTime3, OnTime_minus_OffTime3))
+### widedata %>% filter(id %in% "66")
+   
+# Check values when number of runs is less than 5
+#widedata %>% select(OnTime1, OffTime1, OnTime2, OffTime2, OnTime3, OffTime3) %>% summarize_all(funs(min, max, median))
+### widedata %>% filter(Total_runs_Stroop_On1 < 5 | Total_runs_Stroop_Off1 < 5 |
+###                      Total_runs_Stroop_On2 < 5 | Total_runs_Stroop_Off2 < 5 | 
+###                      Total_runs_Stroop_On3 < 5 | Total_runs_Stroop_Off3 < 5) %>%
+###             select(id, Total_runs_Stroop_On1, OnTime1, Total_runs_Stroop_Off1, OffTime1, Total_runs_Stroop_On2, OnTime2,
+###                    Total_runs_Stroop_Off2, OffTime2, Total_runs_Stroop_On3, OnTime3, Total_runs_Stroop_Off3, OffTime3)
+
+# Presume that all of these are values for one run only so multiply values by 5; there are consistent small values for id 12, 31, 66
+## Presume runs 5
+widedata <- widedata %>% mutate(OnTime1 = ifelse(id %in% c("12", "31", "66"), 5*OnTime1, OnTime1)) %>%
+  mutate(OffTime1 = ifelse(id %in% c("12", "31", "66"), 5*OffTime1, OffTime1)) %>%
+  mutate(OnTime2 = ifelse(id %in% c("12", "31", "66"), 5*OnTime2, OnTime2)) %>%
+  mutate(OffTime2 = ifelse(id %in% c("12", "31", "66"), 5*OffTime2, OffTime2)) %>%
+  mutate(OnTime3 = ifelse(id %in% c("12", "31", "66"), 5*OnTime3, OnTime3)) %>%
+  mutate(OffTime3 = ifelse(id %in% c("12", "31", "66"), 5*OffTime3, OffTime3)) %>%
+  mutate(OnTime_minus_OffTime1 = ifelse(id %in% c("12", "31", "66"), OnTime1-OffTime1, OnTime_minus_OffTime1)) %>%
+  mutate(OnTime_minus_OffTime2 = ifelse(id %in% c("12", "31", "66"), OnTime2-OffTime2, OnTime_minus_OffTime2)) %>%
+  mutate(OnTime_minus_OffTime3 = ifelse(id %in% c("12", "31", "66"), OnTime3-OffTime3, OnTime_minus_OffTime3)) %>%
+  mutate(Total_runs_Stroop_On1 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On1)) %>%
+  mutate(Total_runs_Stroop_On2 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On2)) %>%
+  mutate(Total_runs_Stroop_On3 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On3)) %>%
+  mutate(Total_runs_Stroop_Off1 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On1)) %>%
+  mutate(Total_runs_Stroop_Off2 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On2)) %>%
+  mutate(Total_runs_Stroop_Off3 = ifelse(id %in% c("12", "31", "66"), 5, Total_runs_Stroop_On3)) 
+
+  
+```
+
+
+              
+Variables where no obvious changes are needed: 
+
+* colour_blind  
+* video_games  
+* device  
+* headphones  
+
+Summary of changes: 
+
+* yrs_english: Remove strings; convert numbers in text to digits  
+* order_of_levels: needed to be split into levels, creating variables distraction1/2/3 with levels control/lyrics/classical; there are lots of missing values so will rely on level variable that was input for each auditory distraction  
+* level1/2/3: rationalize all input values to one of control/lyrics/classical  
+* sleep1/2/3: strip characters and convert to numeric  
+* start_time1/2/3:    
+    + created hour variable (e.g., start_time1_hour) by hand (numeric, value from 1-24, with .5 only when exact)  
+    + 2 values of "Evening" changed to 19h, value of "dinner time" change to 18h  
+    + values of 4:53, 5:00 presumed to be PM  
+    + then changed to morning (7am-noon), afternoon(12:30-18), evening
+* OnTime1/2/3, OffTime1/2/3, OnTime_minus_OffTime1/2/3: Remove strings; convert to numeric  
+* Total_runs_Stroop_Off2/3: for id 66 and 68, switched runs and times values apparently recorded in wrong columns  
+* For id 12, 31, 66, Total_runs_StroopOn/Off/1/2/3 consistently  less than 5.  Presumed all times are for one run only.  Replaced by value times 5 and set all number of runs to 5.  [Revisit later]
+
+Rationalization where there are redundancies in data:  
+
+* distraction1/2/3 with level1/2/3 (errors that could not be corrected noted below)  
+* check if calculated difference between OnTime and OffTime is greater than entered difference (>.0011 discrepancy)  [For now, will go with entered difference]
+
+Unresolved issues:
+
+* level1/2/3 versus distraction 1/2/3, consistence in auditory distraction levels:   
+    + subject 48 specified control/classical/lyrics but then has level1/2/3=control/lyrics/classical  
+    + subject 68 specified lyrics/classical/control but then has level1/2/3=control/lyrics/classical  
+* 13 cases with calculated difference between OnTime and OffTime is greater than calculated difference (>.0011 discrepancy); see tables above
+* For id 12, 31, 66, Total_runs_StroopOn/Off/1/2/3 consistently  less than 5.
+  
+
+
+# Write versions of clean data -- long and wide
+
+```{r, include=FALSE}
+
+data1 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level1, sleep1, start_time1_hour, OffTime1, OnTime1, Total_runs_Stroop_Off1, Total_runs_Stroop_On1, OnTime_minus_OffTime1) %>%
+  mutate(order = 1);
+
+data2 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level2, sleep2, start_time2_hour, OffTime2, OnTime2, Total_runs_Stroop_Off2, Total_runs_Stroop_On2, OnTime_minus_OffTime2) %>%
+  mutate(order = 2);
+
+data3 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level3, sleep3, start_time3_hour, OffTime3, OnTime3, Total_runs_Stroop_Off3, Total_runs_Stroop_On3, OnTime_minus_OffTime3) %>%
+  mutate(order = 3);
+
+
+names(data1)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data2)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data3)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+
+longdata <- rbind(data1, data2, data3)
+
+longdata <- longdata %>% mutate(distraction_level = factor(distraction_level, levels=c("control", "classical", "lyrics")))
+
+longdata <- longdata %>% arrange(id, order)
+
+
+
+write.csv(longdata, "cleandata_long.csv", row.names=F)
+write.csv(widedata, "cleandata_wide.csv", row.names=F)
+
+```
+
+Created files cleandata_long.csv and cleandata_wide.csv

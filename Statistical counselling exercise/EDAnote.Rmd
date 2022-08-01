@@ -1,0 +1,531 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+  html_notebook: default
+  
+---
+
+In this study, we are interested in how auditory distraction affects cognitive flexibility, which is the ability of brain to shift between thinking about different problem. In this experiment, different music is taken as different levels of auditory distraction and time records of stroop test taken when listening to those certain music represent cognitive flexibility.
+
+Start EDA by taking a overall look at data.
+```{r}
+stroop_data <- read.csv("sta490_cognitive_flexibility_data.csv")
+library(ggplot2)
+library(naniar)
+library(stringr)
+library(dplyr)
+library(plyr)
+library(reshape2)
+stroop_data
+```
+
+Data comes in a extremely complicated form, conversion is supposed to be done before any further analysis. First convert column names to a easy-to-use form.
+
+```{r}
+colnames(stroop_data)
+new_colnames <- c("x",
+  "colour_blind","yrs_English","video_games","device","headphones","order_of_levels",
+  "level_1","sleep_1","start_hour_1","Offtime_1","Ontime_1","Offrun_1","Onrun_1","difference_1",
+  "level_2","sleep_2","start_hour_2","Offtime_2","Ontime_2","Offrun_2","Onrun_2","difference_2",
+  "level_3","sleep_3","start_hour_3","Offtime_3","Ontime_3","Offrun_3","Onrun_3","difference_3","ID")
+colnames(stroop_data) <- (new_colnames)
+colnames(stroop_data)
+```
+
+column **x** is redudant since we have column **ID**, both column contains same information. Don't know why this return warnings.
+
+```{r}
+stroop_data <- subset(stroop_data, select = -c(x))
+```
+
+Since there is only one obs 'Yes' entry in colour blindness, it's impossible to take effect of colour blindness into account. But may I simply remove that observation? Or should I simply do not take coulour blindness as a predictor during analysis but keep other data of this observation during analysis? Since there is only one observation,even comparision between this measurement and mean of other observations seems meaningless.
+
+```{r, eval = TRUE}
+stroop_data <- stroop_data[stroop_data$colour_blind != 'Yes' ,]
+stroop_data <- subset(stroop_data,select = -c(colour_blind))
+```
+
+```{r}
+stroop_data$yrs_English
+```
+
+Data in yrs_English has two different form, simply number and number + string. Nonetheless, different forms of data contains similar information, need to convert these values into same form.
+
+```{r}
+class(stroop_data$yrs_English[1])
+as.character(stroop_data$years_English)
+
+for (years in stroop_data$yrs_English) {
+  if(is.na(as.numeric(years))){
+    ####WARNING will raise if as.numeric() return NA, but I want to evaluate wether as.numeric() returns NA
+    ####so these warnings can be ignored
+    years <- substring(years,1,2)
+  }
+}
+
+stroop_data$yrs_English <- as.numeric(stroop_data$yrs_English)
+
+stroop_data$yrs_English
+class(stroop_data$yrs_English)
+```
+
+Stroop test record data have the same problem as yrs_English. Also need to be converted into consistent form.
+```{r, eval = FALSE}
+####1
+stroop_data$Offtime_1 <- str_replace(stroop_data$Offtime_1, 's', '')
+stroop_data$Offtime_1 <- as.numeric(stroop_data$Offtime_1)
+####2
+stroop_data$Ontime_1 <- str_replace(stroop_data$Ontime_1, 's', '')
+stroop_data$Ontime_1 <- as.numeric(stroop_data$Ontime_1)
+####3
+stroop_data$Offtime_2 <- str_replace(stroop_data$Offtime_2, 's', '')
+stroop_data$Offtime_2 <- as.numeric(stroop_data$Offtime_2)
+####4
+stroop_data$Ontime_2 <- str_replace(stroop_data$Ontime_2, 's', '')
+stroop_data$Ontime_2 <- as.numeric(stroop_data$Ontime_2)
+####5
+stroop_data$Offtime_3 <- str_replace(stroop_data$Offtime_2, 's', '')
+stroop_data$Offtime_3 <- as.numeric(stroop_data$Offtime_2)
+####6
+stroop_data$Ontime_3 <- str_replace(stroop_data$Ontime_3, 's', '')
+stroop_data$Ontime_3 <- as.numeric(stroop_data$Ontime_3)
+####7
+stroop_data$difference_1 <- str_replace(stroop_data$difference_1, 's', '')
+stroop_data$difference_1 <- as.numeric(stroop_data$difference_1)
+####8
+stroop_data$difference_2 <- str_replace(stroop_data$difference_2, 's', '')
+stroop_data$difference_2 <- as.numeric(stroop_data$difference_2)
+####9
+stroop_data$difference_3 <- str_replace(stroop_data$difference_3, 's', '')
+stroop_data$difference_3 <- as.numeric(stroop_data$difference_3)
+```
+
+**sleep_x** values are also not in consistent form. 
+
+```{r,eval = TRUE}
+stroop_data$sleep_1
+pattern_hour <- "([hH])"
+for (col in c(stroop_data$sleep_1,stroop_data$sleep_2,stroop_data$sleep_3)) {
+  for (time in col) {
+    time <- str_split(time, pattern_hour[[1]][[1]])
+  }
+  as.numeric(col)
+}
+class(stroop_data$sleep_1)
+```
+
+The above loop doesn't work. I will try another approach.
+
+```{r}
+pattern_hour <- "([hH])"
+as.character(stroop_data$sleep_1)
+for (time in stroop_data$sleep_1) {
+    time <- str_split(time, pattern_hour[[1]][[1]])
+}
+stroop_data$sleep_1 <- as.numeric(stroop_data$sleep_1)
+class(stroop_data$sleep_1)
+
+as.character(stroop_data$sleep_2)
+for (time in stroop_data$sleep_2) {
+    time <- str_split(time, pattern_hour[[1]][[1]])
+}
+stroop_data$sleep_2 <- as.numeric(stroop_data$sleep_2)
+class(stroop_data$sleep_2)
+
+as.character(stroop_data$sleep_3)
+for (time in stroop_data$sleep_3) {
+    time <- str_split(time, pattern_hour[[1]][[1]])
+}
+stroop_data$sleep_3 <- as.numeric(stroop_data$sleep_3)
+class(stroop_data$sleep_3)
+```
+So I'm assuming the outloop of first code chunk is not working, but why? How to make it work?
+
+
+
+**start_hour_x** values are also complicated, and I don't think we need to analyze **start_hour_x** as numeric value, converting those value to levels like 'morning','afternoon','evening' is supposed to be better. However, I'm wondering how to identify the levels.
+
+
+**condition_x** values also do not have consistent form. Here I'd like to define 'quiet' as level1, 'classic' as level2, 'lyrics' as level3. 
+
+```{r,eval = FALSE}
+distractionTolevel <- function(distractionColumn){
+  distractionColumn <- as.character(distractionColumn)
+  for(distraction in distractionColumn){
+    if(str_detect(distraction,'[qQ]') | str_detect(distraction,'[Cc]on')){
+      distraction <- 'Control (quiet)'
+    }
+    if(str_detect(distraction,'[Cc]lass') | str_detect(distraction,'[Mm]oz')){
+      distraction <- 'Classical (Mozart)'
+    }
+    if(str_detect(distraction, '[Ss]ha') | str_detect(distraction, '[Ee]') | str_detect(distraction, '[Ll]yric')){
+      distraction <- 'Song with lyrics (Shape of You by Ed Sheeran)'
+    }
+  }
+  return(distractionColumn)
+}
+
+stroop_data$level_1 <- distractionTolevel(stroop_data$level_1)
+stroop_data$level_1
+stroop_data$level_2 <- distractionTolevel(stroop_data$level_2)
+stroop_data$level_2
+stroop_data$level_3 <- distractionTolevel(stroop_data$level_3)
+stroop_data$level_3
+```
+
+Above code did not work, guess it's beause input variable are used by the function as a input value rather than a input object. Here come problem, how to make pointer to existing object in R?
+
+Will try another approach to convert level data.
+
+```{r}
+######level of first run
+stroop_data$level_1 <- as.character(stroop_data$level_1)
+class(stroop_data$level_1)
+for(i in c(1:length(stroop_data$level_1))){
+  if(str_detect(stroop_data$level_1[i],'([qQ][Uu])') | str_detect(stroop_data$level_1[i],'([Cc][Oo][Nn])') | 
+     str_detect(stroop_data$level_1[i],'([Ss][Ii][Li])') | str_detect(stroop_data$level_1[i], '([Nn][Oo] [Mm])')){
+    stroop_data$level_1[i] <- 'Control(quiet)'
+  }
+  
+  if(str_detect(stroop_data$level_1[i],'([Cc][Ll][Aa][Ss])') | str_detect(stroop_data$level_1[i],'([Mm][oO][Zz])')
+     |str_detect(stroop_data$level_1[i], '([Ii][Nn][Ss][Tt])')){
+    stroop_data$level_1[i] <- 'Classical(Mozart)'
+  }
+  
+  if(str_detect(stroop_data$level_1[i], '([Ss][Hh][Aa])') | str_detect(stroop_data$level_1[i], '([Ee][Dd])')|
+     str_detect(stroop_data$level_1[i], '([Ll][Yy][Rr])')){
+    stroop_data$level_1[i] <- 'Song with lyrics(Shape of You by Ed Sheeran)'
+  }
+  
+}
+as.factor(stroop_data$level_1)
+
+######level of second run
+stroop_data$level_2 <- as.character(stroop_data$level_2)
+class(stroop_data$level_2)
+for(i in c(1:length(stroop_data$level_2))){
+  if(str_detect(stroop_data$level_2[i],'([qQ][Uu])') | str_detect(stroop_data$level_2[i],'([Cc][Oo][Nn])') | 
+     str_detect(stroop_data$level_2[i],'([Ss][Ii][Ll])') | str_detect(stroop_data$level_2[i], '([Nn][Oo] [Mm])')){
+    stroop_data$level_2[i] <- 'Control(quiet)'
+  }
+  
+  if(str_detect(stroop_data$level_2[i],'([Cc][Ll][Aa][Ss])') | str_detect(stroop_data$level_2[i],'([Mm][oO][Zz])')
+     |str_detect(stroop_data$level_2[i], '([Ii][Nn][Ss][Tt])')){
+    stroop_data$level_2[i] <- 'Classical(Mozart)'
+  }
+  
+  if(str_detect(stroop_data$level_2[i], '([Ss][Hh][Aa])') | str_detect(stroop_data$level_2[i], '([Ee][Dd])')
+                                                      | str_detect(stroop_data$level_2[i], '([Ll][Yy][Rr])')){
+    stroop_data$level_2[i] <- 'Song with lyrics(Shape of You by Ed Sheeran)'
+  }
+}
+as.factor(stroop_data$level_2)
+
+#####level of third run
+
+stroop_data$level_3 <- as.character(stroop_data$level_3)
+class(stroop_data$level_3)
+for(i in c(1:length(stroop_data$level_3))){
+  if(str_detect(stroop_data$level_3[i],'([qQ][Uu])') | str_detect(stroop_data$level_3[i],'([Cc][Oo][Nn])') | 
+     str_detect(stroop_data$level_3[i],'([Ss][Ii][Ll])') | str_detect(stroop_data$level_3[i], '([Nn][Oo] [Mm])')){
+    stroop_data$level_3[i] <- 'Control(quiet)'
+  }
+  
+  if(str_detect(stroop_data$level_3[i],'([Cc][Ll][Aa][Ss])') | str_detect(stroop_data$level_3[i],'([Mm][oO][Zz])')
+     | str_detect(stroop_data$level_3[i], '([Ii][Nn][Ss][Tt])')){
+    stroop_data$level_3[i] <- 'Classical(Mozart)'
+  }
+  
+  if(str_detect(stroop_data$level_3[i], '([Ss][Hh][Aa])') | str_detect(stroop_data$level_3[i], '([Ee][Dd])')|
+     str_detect(stroop_data$level_3[i], '([Ll][Yy][Rr])') |str_detect(stroop_data$level_3[i],'([Ss][Oo][Nn][Gg])')){
+    stroop_data$level_3[i] <- 'Song with lyrics(Shape of You by Ed Sheeran)'
+  }
+}
+as.factor(stroop_data$level_3)
+```
+
+Originally, I did not add ***as.factor()** function in above code chunk. But the first run returns that there are some input I cannot have imaged, adding this **as.factor()** statement will return me with levels in the column, this really helps me out.
+
+So basically, what I'm doing is that, writing down loop for level_1, run it, check inregular levels, add corresponding expressions in **if** statement, then do same for level_2 and level_3
+
+Now take a initial look at the stroop data using boxplot.
+
+```{r,eval=FALSE}
+par(mfrow=c(1,3))
+boxplot(stroop_data$Offtime_1,stroop_data$Offtime_2,stroop_data$Offtime_3)
+boxplot(stroop_data$Ontime_1,stroop_data$Ontime_2,stroop_data$Ontime_3)
+boxplot(stroop_data$difference_1,stroop_data$difference_2,stroop_data$difference_3)
+```
+
+There are outliers data for all runs, and almost all of those outliers are smaller than Q1-3IQR. Take a closer look at original dataset.
+
+There are 3 candidates (Id 12,31,66) who put in runtime records less than 15s, which is apparently too fast to complete 5 runs. These data looks more like run time of a single run for a 5-run set. Now I got 2 choices, first, ignoring these 3 observations when analyzing run time but included them when analyze other measurement or simply delete these 3 observations?
+
+```{r}
+outlier_check <- subset(stroop_data,ID == 12 | ID == 31 | ID == 66)
+outlier_check
+```
+(Question: when I run the above code in Rnotebook there is warning messages but when I run them in concole there is not such message, why?)
+
+After a more careful look into these 3 observations, the on-off runtime difference value and numbers of on-off runs are also questionable. For example, there are **total number of runs** less than 5 and **integer on-off runtime difference** value. Since each onrun or offrun requires 5 runs without failure, apparently **total number of runs** can not be 5. In addition, though **on-off runtime difference** may be a integer value, but it's unlikely that all 3 **difference** value of a single candidate are integer.
+
+More specifically, **candidate 12** only have reasonable **on-off runtime difference** value. **Candidate 31** have no reasonable data. **Candidate 66** has data seems suitable for **difference_1** and **difference_2**. As for **difference_3** of **Candidate 66**, though it look like this candidate put value for difference in **offrun_3**, there is no exact evidence.
+
+Since these 3 outliers observations only have reasonable **on-off runtime difference** value, we can't verify this value by compare this **difference_x** value to difference between Ontime and Offtime.
+
+Therefore, I'd like to either set their value to N/A or simply remove these 3 observations.
+
+```{r removeOutliers, eval=TRUE}
+stroop_data <- subset(stroop_data, ID != 12 & ID!= 31 &ID != 66)
+```
+
+I found several N/A, but when I looked back to the original dataset, they are not N/A. There must be something wrong with conversion code. Can't go further before fix this problem
+
+```{r}
+stroop_data_checkNA <-read.csv("sta490_cognitive_flexibility_data.csv")
+```
+
+For **Offtime_1**, id24 and id54 are N/A. ID 24 is NA because I specify small replcae 's' in conversion code, need to change that. id54 is N/A because this data is in a strange form, it has a ' at its front.
+
+In order to fix this problem, I set previous time record conversion, boxplot and outlier removal code chunks to eval = FALSE, write down the following code, and re-run all the code chunks.
+
+```{r}
+pattern_record <- '[Ss]'
+####1
+#######Pre-process the strange entry of observation id54
+stroop_data$Offtime_1 <- as.character(stroop_data$Offtime_1)
+stroop_data$Offtime_1[stroop_data$ID == 54] <- str_replace(stroop_data$Offtime_1[stroop_data$ID == 54],'`','')
+print(stroop_data$Offtime_1[stroop_data$ID == 54])
+
+######Question: I have tried to assign stroop_data$Offtime_1[stroop_data$ID == 54] to a new variable
+################then perform operations on the new variable, as a result, the original entry is unaffected
+################I guess this might because I assign the value to the new variable instead of the object
+################then how to make a pointer in R?
+
+
+################Non-functional code provided below
+################strange_entry <- stroop_data$Offtime_1 <- as.character(stroop_data$Offtime_1)
+################strange_entry <- str_replace(strange_entry,'`','')
+################stroop_data$Offtime_1[stroop_data$ID == 54]
+
+stroop_data$Offtime_1 <- str_replace(stroop_data$Offtime_1, pattern_record, '')
+stroop_data$Offtime_1 <- as.numeric(stroop_data$Offtime_1)
+
+###############TRUE represent 1, so -TRUE = -1, if there is a -1 in -checkNA, which means a TRUE in checkNA
+###############all(eval((-checkNA>=0))) will return FALSE
+checkNA <- is.na(stroop_data$Offtime_1)
+all(eval((-checkNA>=0)))
+    
+####2
+stroop_data$Ontime_1 <- as.character(stroop_data$Ontime_1)
+stroop_data$Ontime_1 <- str_replace(stroop_data$Ontime_1, pattern_record, '')
+stroop_data$Ontime_1 <- as.numeric(stroop_data$Ontime_1)
+checkNA <- is.na(stroop_data$Ontime_1)
+all(eval((-checkNA>=0)))
+####3
+stroop_data$Offtime_2 <- as.character(stroop_data$Offtime_2)
+stroop_data$Offtime_2 <- str_replace(stroop_data$Offtime_2, pattern_record, '')
+stroop_data$Offtime_2 <- as.numeric(stroop_data$Offtime_2)
+checkNA <- is.na(stroop_data$Offtime_2)
+all(eval((-checkNA>=0)))
+####4
+stroop_data$Ontime_2 <- as.character(stroop_data$Ontime_2)
+stroop_data$Ontime_2 <- str_replace(stroop_data$Ontime_2, pattern_record, '')
+stroop_data$Ontime_2 <- as.numeric(stroop_data$Ontime_2)
+checkNA <- is.na(stroop_data$Ontime_2)
+all(eval((-checkNA>=0)))
+####5
+stroop_data$Offtime_3 <- as.character(stroop_data$Offtime_3)
+stroop_data$Offtime_3 <- str_replace(stroop_data$Offtime_3, pattern_record, '')
+stroop_data$Offtime_3 <- as.numeric(stroop_data$Offtime_3)
+checkNA <- is.na(stroop_data$Offtime_3)
+all(eval((-checkNA>=0)))
+####6
+stroop_data$Ontime_3 <- as.character(stroop_data$Ontime_3)
+stroop_data$Ontime_3 <- str_replace(stroop_data$Ontime_3, pattern_record, '')
+stroop_data$Ontime_3 <- as.numeric(stroop_data$Ontime_3)
+checkNA <- is.na(stroop_data$Ontime_3)
+all(eval((-checkNA>=0)))
+
+####7
+stroop_data$difference_1 <- as.character(stroop_data$difference_1)
+stroop_data$difference_1 <- str_replace(stroop_data$difference_1, pattern_record, '')
+stroop_data$difference_1 <- as.numeric(stroop_data$difference_1)
+checkNA <- is.na(stroop_data$difference_1)
+all(eval((-checkNA>=0)))
+
+####8
+stroop_data$difference_2 <- as.character(stroop_data$difference_2)
+stroop_data$difference_2 <- str_replace(stroop_data$difference_2, pattern_record, '')
+stroop_data$difference_2 <- as.numeric(stroop_data$difference_2)
+checkNA <- is.na(stroop_data$difference_2)
+all(eval((-checkNA>=0)))
+
+####9
+stroop_data$difference_3 <- as.character(stroop_data$difference_3)
+stroop_data$difference_3 <- str_replace(stroop_data$difference_3, pattern_record, '')
+stroop_data$difference_3 <- as.numeric(stroop_data$difference_3)
+checkNA <- is.na(stroop_data$difference_3)
+all(eval((-checkNA>=0)))
+```
+
+There is one N/A entry persist with this new replace pattern, which is **Offtime_3** of id 66. Looked back to the original dataset, it is an empty entry. In addition, it's also one of the 3 meaningless observations, therefore, result from the new replcement pattern is adequate.
+
+Finally realize that I can write a function instead of repeating all these code in the above chunk after I have done writting.
+
+Re-create boxplot.
+
+```{r}
+par(mfrow=c(1,3))
+boxplot(stroop_data$Offtime_1,stroop_data$Offtime_2,stroop_data$Offtime_3)
+boxplot(stroop_data$Ontime_1,stroop_data$Ontime_2,stroop_data$Ontime_3)
+boxplot(stroop_data$difference_1,stroop_data$difference_2,stroop_data$difference_3)
+```
+
+Meaningless observations mentioned above is still outliers. Am I supposed to remove them?
+
+```{r removeOutliers2, eval=FALSE}
+stroop_data <- subset(stroop_data, ID != 12 & ID!= 31 &ID != 66)
+```
+
+
+```{r}
+par(mfrow=c(1,3))
+boxplot(stroop_data$Offtime_1,stroop_data$Offtime_2,stroop_data$Offtime_3, xlab='Off1       Off2       Off3')
+boxplot(stroop_data$Ontime_1,stroop_data$Ontime_2,stroop_data$Ontime_3, xlab = 'On1       On2       On3')
+boxplot(stroop_data$difference_1,stroop_data$difference_2,stroop_data$difference_3,xlab='diff1       diff2       diff3')
+```
+
+The boxplot is aginist my intuitive assumption: later runs will have better record than early runs. There are significant difference in sample mean of record from different runs. So the order of runs is not so important that we may not need to include it in further analysis to make the the model simplier.
+
+Based discussion during lecture, need to convert the dataframe to a new form as a whole for further analysis.
+
+```{r withColorBlind,eval=FALSE}
+data1 <- stroop_data %>% 
+  select(ID, colour_blind, yrs_English, video_games, device, headphones, order_of_levels,
+         level_1, sleep_1, start_hour_1, Offtime_1, Ontime_1, Offrun_1, Onrun_1, difference_1) %>%
+  mutate(order = 1);
+
+data2 <- stroop_data %>% 
+  select(ID, colour_blind, yrs_English, video_games, device, headphones, order_of_levels,
+         level_2, sleep_2, start_hour_2, Offtime_2, Ontime_2, Offrun_2, Onrun_2, difference_2) %>%
+  mutate(order = 2);
+
+data3 <- stroop_data %>% 
+  select(ID, colour_blind, yrs_English, video_games, device, headphones, order_of_levels,
+         level_3, sleep_3, start_hour_3, Offtime_3, Ontime_3, Offrun_3, Onrun_3, difference_3) %>%
+  mutate(order = 3);
+
+
+names(data1)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data2)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data3)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+
+longdata <- rbind(data1, data2, data3)
+
+#longdata <- longdata %>% mutate(distraction_level = factor(distraction_level, levels=c("control", "classical", "lyrics")))
+
+longdata <- longdata %>% arrange(ID, order)
+```
+
+```{r includeColorBlind,eval=TRUE}
+data1 <- stroop_data %>% 
+  select(ID, yrs_English, video_games, device, headphones, order_of_levels,
+         level_1, sleep_1, start_hour_1, Offtime_1, Ontime_1, Offrun_1, Onrun_1, difference_1) %>%
+  mutate(order = 1);
+
+data2 <- stroop_data %>% 
+  select(ID, yrs_English, video_games, device, headphones, order_of_levels,
+         level_2, sleep_2, start_hour_2, Offtime_2, Ontime_2, Offrun_2, Onrun_2, difference_2) %>%
+  mutate(order = 2);
+
+data3 <- stroop_data %>% 
+  select(ID, yrs_English, video_games, device, headphones, order_of_levels,
+         level_3, sleep_3, start_hour_3, Offtime_3, Ontime_3, Offrun_3, Onrun_3, difference_3) %>%
+  mutate(order = 3);
+
+
+names(data1)[7:14] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data2)[7:14] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data3)[7:14] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+
+longdata <- rbind(data1, data2, data3)
+
+#longdata <- longdata %>% mutate(distraction_level = factor(distraction_level, levels=c("control", "classical", "lyrics")))
+
+longdata <- longdata %>% arrange(ID, order)
+```
+
+```{r}
+par(mfrow = c(1,3))
+hist(longdata$OffTime)
+hist(longdata$OnTime)
+hist(longdata$OnTime_minus_OffTime)
+```
+
+Besides the meaningless outliers mentioned above, histgram of offtime and Ontime look adequately normal distributed, while histgram of difference shows left-skewness. Try QQplot.
+
+```{r}
+qqnorm(longdata$OffTime , main = 'Offtime Normal QQplot')
+qqline(longdata$OffTime , col = 'red')
+qqnorm(longdata$OnTime , main = 'Ontime Normal QQplot')
+qqline(longdata$OnTime , col = 'red')
+qqnorm(longdata$OnTime_minus_OffTime , main = 'Difference Normal QQplot')
+qqline(longdata$OnTime_minus_OffTime , col = 'red')
+```
+
+Based On QQplot, ignore outliers, even the difference qqplot looks adequately normal distributed. Linear regression could be a good choice for further analysis. 
+
+I have changed code chunk for data removal to **eval = TRUE** and created new qqplot, new plot is even more closer to normal. 
+
+```{r}
+par(mfrow = c(1,3))
+boxplot(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OffTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OffTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OffTime)
+
+par(mfrow = c(1,3))
+boxplot(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime)
+
+par(mfrow = c(1,3))
+boxplot(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime_minus_OffTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime_minus_OffTime)
+boxplot(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime_minus_OffTime)
+```
+
+```{r}
+par(mfrow = c(1,3))
+hist(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OffTime)
+hist(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OffTime)
+hist(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OffTime)
+
+par(mfrow = c(1,3))
+hist(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime)
+hist(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime)
+hist(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime)
+
+par(mfrow = c(1,3))
+hist(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime_minus_OffTime)
+hist(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime_minus_OffTime)
+hist(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime_minus_OffTime)
+```
+
+```{r}
+qqnorm(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OffTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OffTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OffTime)
+
+qqnorm(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime)
+
+qqnorm(subset(longdata, longdata$distraction_level == 'Control(quiet)')$OnTime_minus_OffTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Classical(Mozart)')$OnTime_minus_OffTime)
+qqnorm(subset(longdata, longdata$distraction_level == 'Song with lyrics(Shape of You by Ed Sheeran)')$OnTime_minus_OffTime)
+```
+
+Though based on histgram and qqplot normality asusmpition holds for different distraction levels, it seems data from different distraction levels also shows difference in sample mean. This is questionable. If there was no difference in result from different distration level, the analysis is done here. For furture analysis, a simple model is not suitale, need to consider complex model with more parameters. But first, a careful sample mean test should be performed.

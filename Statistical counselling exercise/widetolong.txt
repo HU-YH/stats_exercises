@@ -1,0 +1,25 @@
+data1 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level1, sleep1, start_time1_hour, OffTime1, OnTime1, Total_runs_Stroop_Off1, Total_runs_Stroop_On1, OnTime_minus_OffTime1) %>%
+  mutate(order = 1);
+
+data2 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level2, sleep2, start_time2_hour, OffTime2, OnTime2, Total_runs_Stroop_Off2, Total_runs_Stroop_On2, OnTime_minus_OffTime2) %>%
+  mutate(order = 2);
+
+data3 <- widedata %>% 
+  select(id, color_blind, yrs_english, video_games, device, headphones, order_of_levels,
+         level3, sleep3, start_time3_hour, OffTime3, OnTime3, Total_runs_Stroop_Off3, Total_runs_Stroop_On3, OnTime_minus_OffTime3) %>%
+  mutate(order = 3);
+
+
+names(data1)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data2)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+names(data3)[8:15] <- c("distraction_level", "sleep", "start_time", "OffTime", "OnTime", "Total_runs_Stroop_Off", "Total_runs_Stroop_On", "OnTime_minus_OffTime")
+
+longdata <- rbind(data1, data2, data3)
+
+longdata <- longdata %>% mutate(distraction_level = factor(distraction_level, levels=c("control", "classical", "lyrics")))
+
+longdata <- longdata %>% arrange(id, order)

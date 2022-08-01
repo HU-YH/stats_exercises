@@ -1,0 +1,173 @@
+---
+title: Candidates shows better cognitive flexibility when listening to music compare
+  to quiet enviroment
+author: "Yuhan Hu"
+date: "2019/12/01"
+output:
+  pdf_document:
+    df_print: paged
+    latex_engine: xelatex
+    toc: yes
+fontsize: 12pt
+csl: vancouver.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(readr)
+library(knitr)
+library(nlme)
+library(emmeans)
+data <- read_csv("cleandata_long.csv")
+names(data) <- c("id", "cblind", "english", "vgames", "device", "headphones", "alllevels", "distraction", "sleep", "start", "offtime", "ontime", "runsoff", "runson", "diff", "order")
+```
+
+\pagebreak
+
+# Summary
+
+In this study, we are interested in how auditory distractions affect cognitive flexibility. Differences between stroop test on-run time and off-run time is picked as response variable. We choose different music as different distraction levels, which is the predictor of interest. By fitting a linear mixed model, we concluded that distraction levels affect cognitive flexibility and participants performs the worst cognitive flexibility in quiet enviroment.
+
+# Introduction
+
+**Cognitive flexibility** is the ability of the brain to shift between thinking about different concepts or between different tasks (Braem and Egner, 2018). It has been hypothesized that auditory distraction might have an effect on cognitive flexibility. To investigates effect of **auditory distraction** on **cognitive flexibility**, 72 candidates were asked to perform stroop tests by Stroop test app availiable on their phone when listening to different music. Musics represent auditory distraction levels and differences between stroop on-run and off-run under same distraction is regarded as response. 8 other measurements were also recorded because of their potential effect on experiment result.
+
+Details about experiment setting and statistical analysis will be discussed in method section. Answer to the research question is in result section. Potential question underlying this analysis and possible direction for future research are in discussion section.
+
+# Method
+
+## Experiment
+
+In this experiment, different music is regarded as different auditory distraction levels. There are 3 treatment levels in total, which are lyrics, classical and quiet, where quiet enviroment is the reference group. Candidates are required to perform 3 rounds of stroop tests under all 3 distraction levels. For each round of stroop test, candidates are required to successfully complete 5 on-runs and 5 off-runs. Time spend for on-run, time spend for off-run, difference between on-time and off-time, total runs to complete on-run and total runs to complete off-run are collected.
+
+Since participants' ability of shifting between different tasks is interested, differences between stroop on-time and off-time time is a more appropriate response variable than on-time and off-time. The smaller the difference, the better the cognitive flexibility. Experimetnal data was collected from all 72 students enrolled in UofT STA490 2019-2020 session. 
+
+Besides two main variables mentioned above, some other variables that might have effect on **cognitive flexibility** were also collectd. They are types of headphones, order in which the 3 levels of auditory distraction were used, number of years candidate have studied in English language institution, whether or not candidate play video games, hours of sleep before (for each level of auditory distraction), time of day(for each level of distraciton), whether or not the candidate are colour blind, type of device  used for Stroop test app.
+
+
+Covariate       Explanation    
+--------------  ------ 
+headphones       headphone used by participants during stroop test    
+     order       order in which the 3 levels of auditory distraction level were used    
+years English    number of years the candidate have studied in English lanuage institution
+video games      whether or not candidate play video games often
+hours sleep      hours of sleep before taking the test(for each level of auditory distraction)
+time of day      when did the participant did the test(for each level of auditory distraction)
+colour blindness whether this candidate is colour blind or not
+device           device this participant used for stroop test
+
+## Model
+
+Since the research question is 'how auditory distraction affects cognitive flexibility', the variable represents cognitive flexibility is the response, which is difference between on-time and off-time. The variable represents auditory distraction level is the predictor variable of interest, so it is taken into the model as fixed effect.
+
+Since multiple observations were collected from each individual candidate in this experiment, apparently observations from same subject are not independent; thus a random intercept effect is added into the model to accomadate variation due to individual difference among candidates. 
+
+In addition, covariate **order** in which the 3 levels of auditory distraction were used, is also very important since mean of reponse collected under same distraction level differ if order of distraction is different(***Appendix Table 6***), so this is also taken into model as fixed effect. 
+
+In addition, p-value for interaction term is not significant and the answer to the research question remains the same. So we decided not to add interaction between order and distraction to the model for the sake of model simplicity.
+
+Therefore, in our model, differences between on-time and off-time is the response variable, order and disctraction levels are fixed effect predictor variable, and variation result from personal difference of participants is the random intercept effect.
+
+$Y=\beta_0+\sum\beta_{distraction} X_{distraction}+\sum\beta_{order} X_{order}+u+\epsilon$ 
+
+where $Y$ is the response, 
+
+$\sum\beta_{distraction} X_{distraction}$ is the fixed effects of distraction levels and corresponding coefficients,  
+
+$\sum\beta_{order} X_{order}$ is the fixed effects of orders and corresponding coefficients, 
+
+$u$ is the random effect 
+
+and $\epsilon$ is the random error.
+
+```{r diffmodel,echo = FALSE}
+
+#simple.model.plus.order <- lme(diff ~ distraction*order, random=~1|id, method="REML", data=data)
+#kable(anova(simple.model.plus.order), caption = 'Model with interaction term', digits = 3)
+
+# remove interaction
+simple.model.plus.order.no.ix <- lme(diff ~ distraction + order, random=~1|id, method="REML", data=data)
+kable(anova(simple.model.plus.order.no.ix),caption = 'Model without interaction term', digits = 3)
+#kable(Pmisc::lmeTable(simple.model.plus.order.no.ix), digits = 3, caption = 'Coefficient and p-values of model')
+
+```
+
+## Covariates
+
+Color blindness is excluded from analysis since there is only one color blind participant; thus it's impossible to analyze effect of color blindness.
+
+To check whether the rest of covariates affect experiment result. we simply built 2 models for each of those covariates. The first model is simply adding the corresponding covariates as fixed effect to linear mixed model mentioned above, the second model also include the interaction term between corresponding covariate and distraction. If a covariate has significant p-value, we believe it's likely to have impact on experiment result and thus require further investigation.
+
+# Result
+
+## Main research question
+As coefficients and p-value table of the model shown(**Table 2**), coefficients of both music distractions are less than 1. In addition, the reference group, which is quiet enviroment, is assumed to have coeffecient of 1. Recall that the smaller the response variable, the better the cognitive flexibility. So based on this table, we may conclude that auditory distraction levels do affect cognitive flexibility, and people show the worst cognitive flexibility in quiet enviroment. Compare two music distractions, participants show better cognitive flexibility when listening to music with lyrics. 
+
+Notice that though p-value for distraction is significant, p-value for distraction level lyrics is extremely insignificant(0.997), which imply that $\beta_{lyrics}$ is likely to equals 0 and therefore listening to music with lyrics does not affect response. However, since coefficents of the other 2 distraction levels are greater than 0, participants' cognitive flexibility performance when listening to music with lyrics is stil the best.
+
+```{r}
+kable(Pmisc::lmeTable(simple.model.plus.order.no.ix), digits = 3, caption = 'Coefficient and p-values of model')
+
+#kable(summary(emmeans(simple.model.plus.order.no.ix, ~distraction)), caption = 'Estimated marginal means for distraction', digits = 3)
+```
+
+## Covariate
+Among those covariates, only **headphones** and **device** have significant p-value, which imply that these 2 covariates may affect experiment result and need further investigation to identify exact effect. The corrsponding interaction terms are not significant.  
+
+```{r}
+model_dv <- lme(diff ~ distraction + order + device, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_dv), caption = 'Model after adding covariate device but no interaction term')
+
+model_hp <- lme(diff ~ distraction + headphones + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model_hp), caption = 'Model after adding covariate headphones but no interaction term')
+```
+
+# Discussion
+
+There are several problems about this study worth mentioning. 
+
+1. The reference distraction group, quiet enviroment, is very subjective since we simply label no music as quiet. However, variation due to enviromental noises may affect experiment result largely. 
+
+2. All candidates have similar age and education background, which means result obtained from this experiment may not be universal. Future experiment may be conducted on candidates from a wider demographics range. 
+
+3. Though we have found 2 covariates that may have significant effect on experiment result, we didn't incorporate them into a single model, therefore corresponding effects on stroop test result require further investigation. 
+
+4. Data from candidates No.12,31,66 are invalid and therefore modified for analysis. Specifically, invalid values for number of runs, which means values are either non-positive or non-integer, are set to 5. Invalid values for run-time, which means the value are so small that looks like run-time of 1 run rather than 5 successful runs, are multiplied by 5 and use the resultant values for further analysis. Imputation for those participants affects the model significantly(***Appendix Tbale 7***). After remove those candidates, the main fixed effect we concerned about become non-significant.
+
+5. There are observations with ontime-Offtime discrepancies, which means values for differences are not equivalent to values obtained by subtracting ontime by offtime. In addition, fixed effect order becomes non-significant in model using value obtained from subtraction.(***Appendix Table 8***)
+
+# Conclusion
+
+Based on result from above experiment and analysis, we conclude that **auditory distractions** have effect on **cognitive flexibility**, which means ability of shifting between different tasks varies under different distraction levels. Specifically, compare to quiet enviroment, participants shows better cognitive flexibility, by having smaller difference between stroop on-run and off-run, when listening to music. Furthermore, for future research about this topic, investigation about two significant covariates, headphones and devices, could be a direction.
+
+However, there are several problems,mainly about data quality, require concerns. There are plenty of invalid and low quality entries among original data. In this analysis, we decided to modify invalid data to make their values assemble valid entries and left low quality data unchanged. However, significantly different conclusion can be reached if we made different decision during data cleaning step. Besides, similar demographic background of participants and unknown enviromental noises during stroop test may also have impact on experiment result. 
+
+\pagebreak
+
+# Appendix
+
+## Importance of order effect
+
+```{r groupmeanbyorder, echo = FALSE}
+kable(data %>% group_by(distraction, order) %>% summarize(means = mean(diff)), caption = 'Mean of response under different distraction levels with respect to different order of distractions', digits = 3)
+```
+
+
+## Discrepancies
+
+```{r}
+# students 12, 31, 66
+data <- data %>% mutate(runs_error = ifelse(id %in% c(12, 31, 66), 1, 0))
+data %>% group_by(runs_error) %>% summarize(means = mean(diff))
+data_nre <- data %>% filter(runs_error==0)
+model.Vorder.nre <- lme(diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data_nre)
+kable(anova(model.Vorder.nre), caption = 'anova table for model without id 12,31,66')
+#summary(emmeans(model.Vorder.nre, ~distraction))
+```
+
+```{r}
+data <- data %>% mutate(calc_diff = ontime - offtime)
+model.Vorder.calc <- lme(calc_diff ~ distraction + order, random=~1|id, weights=varIdent(form=~1|order), method="REML", data=data)
+kable(anova(model.Vorder.calc), caption = 'anava table for model using difference obtained from subtraciton as response variable')
+```

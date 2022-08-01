@@ -1,0 +1,306 @@
+---
+title: "R Notebook"
+output: 
+  pdf_document:
+    toc: true
+    latex_engine: xelatex
+---
+
+```{r setup, include = FALSE}
+library(dplyr)
+library(lme4)
+library(nlme)
+library(lmerTest)
+library(stringr)
+library(Pmisc)
+library(knitr)
+```
+
+\pagebreak
+
+# Introduction
+
+Cognitive flexibility is the ability of brain to shift between thinking about different problem.(Braem and Egner,2018) In this study, we are interested in how auditory distraction affects cognitive flexibility.
+
+For conducting this experiment, different music is regarded as different levels of auditory distraction. Candidates will perform stroop test when listening to different music and time used to complete On-run test and off-run test are recorded. In addition, other variables may affect stroop-test performance, like sleep time before taking the test and device used for test, are also recorded.
+
+# Method
+
+Differences between stroop-On run and stroop-off run with same level of distraction is taken as response variable. Smaller values represent better cognitive performance. Choose this variable instead of **OnTime** or **OffTime** because **OnTime_minus_OffTime** is an isolated measure of cognitive flexibility.(Fall term project handout)
+
+Since the research question is interested in how auditory distraction affect cognitive flexibility, variable **distraction_level** is taken in as fixed effect. 
+
+In addition, since each candidates contribute to 3 observations, observations from same candidates are apparently not independent and thus correlated. Also, cognitive flexibility differs for different individuals. Therefore, candidates id is taken into the model as random effect.
+
+## Data Cleaning
+Use cleaned data posted on Quercus.
+
+```{r import, include = FALSE}
+longdata <- read.csv('cleandata_long.csv')
+widedata <- read.csv('cleandata_wide.csv')
+```
+
+Then look for outliers.
+
+```{r outlierCleaning, eval = TRUE, include = FALSE}
+
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+outlier_check$out
+min(outlier_check$out)
+
+longdata <- subset(longdata, longdata$id != 31)
+longdata <- subset(longdata, longdata$id != 72)
+
+
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+outlier_check$out
+min(outlier_check$out)
+
+longdata <- subset(longdata, longdata$id != 35)
+longdata <- subset(longdata, longdata$id != 50)
+
+
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+outlier_check$out
+min(outlier_check$out)
+```
+
+Use boxplot to check outlier, remove those candidates with more than 1 outlying response observation.
+
+Procedure: find the minimum outlier value, sort values of **Ontime_minus_Offtime** in decreasing order, then read the data table and try to find if there are candidates with more than 1 outlying response observation. Remove all observations from those candidates.
+
+Candidates 31,35,50,72 are removed at this stage. Relevent boxplot are included in appendix.
+
+
+In addition, **order** is qualitative value in the original dataset, convert to factor first.
+
+## Fitting initial model
+
+Fit the initial and simplest model with only the interested fixed effect and the random effect to take a first look on possible model. Default reference group of distraction_level is classical, but there is a control group, so relevel **longdata$distraction_level** to make 'control' the reference group at first.
+
+```{r simplestfitting, echo = FALSE}
+longdata$distraction_level <- relevel(longdata$distraction_level, ref = 'control')
+
+fitInitial <- lme(OnTime_minus_OffTime ~ distraction_level, random = ~1|id, data = longdata)
+
+
+anovaInitial <- anova(fitInitial)
+
+residual <- residuals(fitInitial)
+qqnorm(residual)
+
+kable(lmeTable(fitInitial))
+kable(anovaInitial)
+```
+
+For this initial model, residual is normal distributed and p-value is significant. Though this is not sufficient for verification of the model, we may stop here about this model since this model is only for taking a glance.
+
+## Backward Selecition
+
+The initial model is too simple, we have more variables that may affect the response variable. It's hard to tell which variables are supposed to be included in the model and which variables are not. At this point, I decided to utlize backward selection technique I learnt from machine learning course, STA314. 
+
+Backward selection technique:(STA314H1F2019 Week3 LEC2)
+
+1.Start with all variables in the model
+
+2.Remove the variable with the largest p-value, which means, the variable that is least statistically significant.
+
+3.The new (p-1)-variable model is fit ,and the variable with the largest p-value is removed.
+
+4.Repeat step 2&3 until a stopping rule is reached. For this analysis, I decided to stop when all remaining variables have a significant p-value.
+
+In addition to independent variables given in the dataset, note that I also add the interaction terms of **factor(order)** and **distraction_level** into the fullmodel. Full model is shown below. More table and plot about full model can be found in appendix.
+
+```{r fullfitting, eval = FALSE, include = TRUE}
+fit_full <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + device + headphones + yrs_english + sleep 
+            + start_time + factor(order) 
+            + distraction_level*factor(order), 
+            random = ~1|id, data = longdata)
+```
+
+Only final model are shown in method section. Intermediate runs are included in appendix.
+
+```{r finalModel, echo = FALSE}
+
+fit_final <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + headphones, 
+                random = ~1|id, data = longdata)
+
+anova_final <- anova(fit_final)
+kable(anova_final, caption = 'Anova table of the final model')
+kable(Pmisc::lmeTable(fit_final), caption = 'lmeTable of the final model')
+
+```
+
+In the final model, all the remaining predictors have significant p-values.
+
+\pagebreak
+
+## Model Verification
+
+Now need to test whether the model meet its assumptions.
+
+```{r testAssumptions, echo = FALSE}
+plot(fit_final)
+qqnorm(residuals(fit_final))
+qqline(residuals(fit_final))
+
+```
+
+From the norm quantile-quantile plot, we can see that distribution of residuals is prrtty close to normal distribution, which is represented by line **x=y** on this plot. Therefore, normality of residuals assumpiton holds.
+
+From the residual plot, we can see that the residual is scatter randomly around 0, so no deviation from linear form is detected, assumpition of linearity holds. In addition, relatively constant variance is also shown on this plot. Though several point is relatively far in the right side, since not all outlier is removed from this analysis, these point may refer to those outliers, so the constant variance assumption holds.
+
+Observation is independent of each other since data are collected from different individuals.
+
+# Result
+
+From the final model, we may conclude that in this experiment, distraction levels, video_games, which stands for whether the candidate plays video games often, and headphones, which stands for type of headphone candidates using when doing the test, have significant effect on cognitive flexiblity. 
+
+More specifically, since value of coefficient is negative, candidates who plays video games often will more likely to have a smaller **Ontime_minus_Offtime** values, which means they show better cognitive flexibility.
+Since, the coefficient of noise cancelling headphones is the smallest, candidates who wear noise-cancelling headphones will have a smaller **Ontime_minus_Offtime** value, which means they perform better cognitive flexibility.
+
+In addition, coefficients of both distraction levels is negative, which implies that candidates actually perform better when they are not in a quiet condition.
+
+Moreover, approximately $\frac{\sigma^2}{\sigma^2+\tau^2}=21.44%$ variation is due to individual cognitive flexibility difference.
+
+
+# Discussion
+
+## Models
+Backward selection method from machine learning course is used for this analysis. Since this method only consider p-value for variable selection, variables that are in the final model may not be the best choice for understanding research question. In addition, not much interaction terms are introduced into the model, which means there might be better fit even if we use the same model selection technique.
+
+## Result interpretation
+
+### Headphones
+Though by using estimated coefficient, we conclude that noise-cancelling headphones will lead to better cognitive flexibility performance in this experiment, p-value for the corresponding estimated $\beta$ is actually not significant, which means this conclusion need further verification.
+
+##Distraction levels
+
+Intuitively, we would like to believe that people will be more concentrated in a quiet condition, which result in a better cognitive flexibility performance. However, result obtained from this experiment is against this intuition. Though to my personal experience, when I was doing some tasks, I felt more concentrated if I was listening to music, there might be other issues we may consider that lead to this counterintuitive conclusion.
+
+For example, in this experiment, candidate will input 'quiet' as distraction level if they were not listening to those two given music, but the so-called 'quiet condition' may not be same for every candidate. 
+
+Also, order of distraction may also be a reason for this counterintuitive conclusion. Intuitively, we believe people will perform better in later run than the first run since candidates are becoming more proficient in the test. However, in this experiment, more than 50% of the candidates choose to do stroop test under quiet conditions first(the default setting on the data collection webpage), which means the low average cognitive flexibility performance under quiet condition may be resulted from increasing proficiency in stroop test.
+
+## Outliers
+
+Not all outliers are cleaned in this analysis, different model and result may be obtained if clean data in an alternative way.
+
+
+# Appendix
+
+## Clean outliers
+```{r attachBoxplot, echo = FALSE}
+
+boxplot(longdata$OnTime_minus_OffTime)
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+print(paste('minimum outlier:', min(outlier_check$out)))
+
+longdata <- subset(longdata, longdata$id != 31)
+longdata <- subset(longdata, longdata$id != 72)
+
+boxplot(longdata$OnTime_minus_OffTime)
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+print(paste('minimum outlier:', min(outlier_check$out)))
+
+longdata <- subset(longdata, longdata$id != 35)
+longdata <- subset(longdata, longdata$id != 50)
+
+boxplot(longdata$OnTime_minus_OffTime)
+outlier_check <- boxplot(longdata$OnTime_minus_OffTime)
+print(paste('minimum outlier:', min(outlier_check$out)))
+```
+
+## Backward Selection full model
+
+```{r fullmodel, echo = FALSE}
+fit_full <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + device + headphones + yrs_english + sleep 
+                + start_time + factor(order) 
+                + distraction_level*factor(order), 
+                random = ~1|id, data = longdata)
+
+anova_full <- anova(fit_full)
+
+residual <- residuals(fit_full)
+qqnorm(residual)
+
+kable(lmeTable(fit_full), caption = 'lmerTable of initial fullmodel for backward selection')
+
+anova_full <- anova(fit_full)
+kable(anova_full, caption = 'Anova table of initial full model for backward selection')
+```
+
+\pagebreak
+
+## Backward Selection intermediate
+
+```{r iteration1, echo =FALSE}
+
+print('remove yrs_english')
+fit_1 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + device + headphones + sleep 
+                + start_time + factor(order) 
+                + distraction_level*factor(order), 
+                random = ~1|id, data = longdata)
+
+anova_1 <- anova(fit_1)
+kable(anova_1, caption = 'Anova table for model after iteration 1 of backward selection')
+```
+
+```{r iteration2, echo =FALSE}
+
+print('remove sleep')
+fit_2 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + device + headphones 
+                + start_time + factor(order) 
+                + distraction_level*factor(order), 
+                random = ~1|id, data = longdata)
+
+anova_2 <- anova(fit_2)
+kable(anova_2, caption = 'Anova table for model after iteration 2 of backward selection')
+```
+
+```{r iteration3, echo = FALSE}
+
+print('remove interaction term')
+fit_3 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + device + headphones + start_time 
+                + factor(order) , 
+                random = ~1|id, data = longdata)
+
+anova_3 <- anova(fit_3)
+kable(anova_3, caption = 'Anova table for model after iteration 3 of backward selection')
+
+```
+
+\pagebreak
+
+```{r iteration4, echo = FALSE}
+
+print('remove device')
+fit_4 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + headphones + start_time + factor(order), 
+                random = ~1|id, data = longdata)
+
+anova_4 <- anova(fit_4)
+kable(anova_4, caption = 'Anova table for model after iteration 4 of backward selection')
+
+```
+
+```{r iteration5, echo = FALSE}
+
+print('remove factor(order)')
+fit_5 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + headphones + start_time, 
+                random = ~1|id, data = longdata)
+
+anova_5 <- anova(fit_5)
+kable(anova_5, caption = 'Anova table for model after iteration 5 of backward selection')
+
+```
+
+```{r iteration6, echo = FALSE}
+
+print('remove start_time')
+fit_6 <- lme(OnTime_minus_OffTime ~ distraction_level + video_games + headphones, 
+                random = ~1|id, data = longdata)
+
+anova_6 <- anova(fit_6)
+kable(anova_6, caption = 'Anova table for model after iteration 6 of backward selection')
+
+```
