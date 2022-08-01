@@ -1,0 +1,117 @@
+---
+title: "STA437 Project"
+author:
+  -Yuhan Hu, 1001311626
+  -Yuying Huang, 1
+date: "2020/3/29"
+output: 
+  pdf_document:
+    toc: true
+    latex_engine: xelatex
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+
+# Summary
+
+
+
+# Data manipulation
+
+```{r load data}
+#prepare data
+original_data <- read.csv('happiness2017.csv')
+set.seed(1626)
+data_for_analysis <- original_data[sample(1:141,100),-1]
+par(mfrow=c(3,3))
+for(i in 2:10){
+  qqnorm(unlist(data_for_analysis[i]),main = paste('Normal qq plot for',colnames(data_for_analysis)[i]))
+}
+plot(data_for_analysis)
+data_for_analysis_na.omit <- na.omit(data_for_analysis)
+
+boxplot(data_for_analysis_na.omit[5])
+boxplot(data_for_analysis_na.omit[6])
+boxplot(data_for_analysis_na.omit[7])
+boxplot(data_for_analysis_na.omit[9])
+```
+
+
+
+# Multiple Linear Model using Original value
+
+```{r MLR}
+#Multiple Linear Model using Original value
+fit1 <- lm(Ladder~.,data = data_for_analysis)
+summary(fit1)
+par(mfrow = c(2,2))
+plot(fit1)
+summary(fit1)
+knitr::kable(summary(fit1))
+```
+
+
+# Multiple Linear Model using Principle Component
+```{r pccovariance}
+#Multiple Linear Model using Principle Component
+##covariance approach
+X <- as.matrix(data_for_analysis_na.omit[2:10])
+X.bar <- apply(X,2,mean)
+s <- cov(X)
+valS <-eigen(s)$values
+vecS <- eigen(s)$vectors
+round(valS/sum(valS),3)
+W = X
+
+for(i in 1:9){
+ 	for(j in 1:nrow(X)){
+	W[j,i] = vecS[,i] %*% ( X[j,] -X.bar)  # centered PCs
+ 	}}
+plot(valS, type="b")
+
+pc1 <- lm(data_for_analysis_na.omit$Ladder~W[,1])
+summary(pc1)
+pc2 <- lm(data_for_analysis_na.omit$Ladder~W[,1]+W[,2])
+summary(pc2)
+pc3 <- lm(data_for_analysis_na.omit$Ladder~W[,1]+W[,2]+W[,3])
+summary(pc3)
+
+```
+
+```{r pccorrelation}
+#Multiple Linear Model using Principle Component
+##correlation approach
+R <- cor(X)
+valR <- eigen(R)$values
+vecR <- eigen(R)$vectors
+round(valR/sum(valR),3)
+
+rownames(vecR) <- colnames(X)
+colnames(vecR) <- c('PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9')
+round(vecR,2)
+
+W.new = X  # just to create a data matrix of the same size of X
+colnames(W.new) = c('PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9')
+
+# now fill in the entries by calculating sample PCs
+
+for(i in 1:9){ # PC's
+ 	for(j in 1:nrow(X)){
+	W.new[j,i] = vecR[,i] %*% X[j,]   # no need to center when using normalized PCCs 
+ }}
+
+
+pc1 <- lm(data_for_analysis_na.omit$Ladder~W[,1]+W[,2]+W[,3])
+summary(pc1)
+
+```
+
+# Appendix
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
