@@ -1,0 +1,127 @@
+---
+title: "A2"
+author: "Yuhan"
+date: "2019/10/15"
+output: 
+   pdf_document:
+     latex_engine: xelatex   
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(INLA)
+library(lme4)
+library(data.table)
+library(Pmisc)
+library(nlme)
+library(MASS)
+data("MathAchieve", package = "MEMSS")
+xSub = readRDS("drugs.rds")
+```
+
+# Math.
+
+
+## Introduction
+
+Experiment about how different factors affect math achievement of students are performed. Here we are interested in whether differences between schools or within school are substantial.
+
+## Methods
+
+Decision about random effect and fixed effect selection is based on aim of the study. Minority, which indicates whether the candidate is a memember of a minority racial group, and socio-economics status as fixed effect. School is selected as random effect since observations obtained from same school are unlikely to be independent, and the research question concerns about the differences in mathematics achievement scores between schools.
+
+For mixed effect model, normality of response variable is assumed. Distribution of MathAch data is shown in Figure1. Though normality assumption is not perfectly met, the distribution is sufficiently good to be regarded as normal distributed.
+
+## Result
+
+Fitted model is shown in table 1. P-value of both fixed effects are significant. students from minorty ethic groups are getting math achievement scores 2.94 units lower than others. For each units increase in socio-economics status scores, resultant math achievement scores increase by 2.13 units. To evaluate the research question, evaluate $\sigma^2/(\sigma^2+\tau^2) = 9.8\%$, which is quite small. This small percentage indicated that differences between school are not substantial.
+
+## Conclusion
+
+From the fitted mixed effect model, it can be concluded that student math achievement differences between schools is not substantial compared to differences within school. 
+
+\pagebreak
+
+# Q3:Drugs.
+
+
+## Introduction
+
+The Treatment Episode Data Set is a dataset contains information about candidates. By analyzing this dataset, we want to clarify two hypothesis.
+1. Chance of a candidate completing drug treatments is affected by type of substances he/she addicted to. More specifically, 'hard' drugs(Heroin, Opiates, Methamphetamine, Cocaine) are more difficult to treat than alcohol or marjuana.
+
+2. Rates of completing treatment is also affected by states. Some states have more effective treatment programs while others may have problematic treatment programs with low completion rates.
+
+## Methods
+
+STFIPS and TOWN are chosen as random effect and the other variables besides EDUC and AGE are chosen as fixed effect. A generalized linear model is fitted.
+
+$log(\mu_i/(1-\mu_i))=X_{it}\beta+U_i+V_i$ where $U_i$ and $V_i$ are individual level random effects, stands for states and town.
+
+Use bayseian inference to find estimate of random effect. In order to do so,a prior distribution is needed. Penalized complexity prior is chosen for this analysis. Since not much information is known about actual distribution. I tried different value set $P(\theta \geq a)\le0.05$ for prior distribution. Then checked the area under prior curve of resultant prior-posterior plot. After several attempts, 0.75 is selected as value of a. Then bayes rule $pr(\theta=a|Y=y)=pr(Y=y|\theta=a)pr(\theta=a)/pr(Y=y)$ can be used to compute posterior.
+
+## Result
+
+
+As shown in table 2 only odds of alcohol is greater than 1. Since marijuana is the reference group, estimated value for marijuana is 1. Odds of all other substances groups are smller than 1, which indicated candidates from these 'hard' drugs groups will have a smaller chance to complete treatment.
+
+State is an individual level random effect. Positive value of this random effect means higher average response value. In this case, probability of treatment completion. As the last table shows, there are states with positive estimate and states with negative estimate.
+
+## Conclusion
+
+Hypothesis 1 is true, compared to those candidates who are addicted to 'hard' drugs, candidates addicted to alcohol and marijuana is more likely to complete treatment.
+
+Hypothesis 2 is true, effectiveness of treatment programs is vary for different states. Some states has more effective treatment programs while some states have problematic treatment programs that result in low rate of completion.
+
+\pagebreak
+
+# Appendix
+
+
+
+## Math
+
+
+```{r q1Math, echo = TRUE}
+hist(MathAchieve$MathAch, xlab = "MathAch",main = paste('Figure1. Histgram of MathAch scores'))
+
+Q1model = lme(MathAch ~ factor(Minority)+SES, random = ~1 |School, data = MathAchieve)
+
+knitr::kable(Pmisc::lmeTable(Q1model), digits = 2, escape = FALSE, format = "latex",caption = "Estimation of MathAchieve mixed model")
+```
+
+\pagebreak
+
+## Q3drugs
+```{r q2drugs, echo = TRUE, warning = FALSE}
+forInla = na.omit(xSub)
+forInla$y = as.numeric(forInla$completed)
+library("INLA")
+ires = inla(y ~ AGE + SUB1 + GENDER + raceEthnicity + homeless +
+              f(STFIPS, hyper=list(prec=list(
+                prior='pc.prec', param=c(0.75, 0.05)))) +
+              f(TOWN,hyper=list(prec=list(
+                prior='pc.prec', param=c(0.75, 0.05)))),
+            data=forInla, family='binomial',
+            control.inla = list(strategy='gaussian', int.strategy='eb'), verbose = TRUE)
+sdState = Pmisc::priorPostSd(ires)
+do.call(matplot, sdState$STFIPS$matplot)
+do.call(legend, sdState$legend)
+toPrint = as.data.frame(rbind(exp(ires$summary.fixed[,
+                                                     c(4, 3, 5)]), sdState$summary[, c(4, 3, 5)]))
+sss = "^(raceEthnicity|SUB1|GENDER|homeless|SD)(.[[:digit:]]+.[[:space:]]+| for )?"
+toPrint = cbind(variable = gsub(paste0(sss, ".*"),
+                                "\\1", rownames(toPrint)), category = substr(gsub(sss,
+                                                                                  "", rownames(toPrint)), 1, 25), toPrint)
+Pmisc::mdTable(toPrint, digits = 3, mdToTex = TRUE,
+               guessGroup = TRUE, caption = "Posterior means and quantiles for model parameters.")
+ires$summary.random$STFIPS$ID = gsub("[[:punct:]]|[[:digit:]]",
+                                     "", ires$summary.random$STFIPS$ID)
+ires$summary.random$STFIPS$ID = gsub("DISTRICT OF COLUMBIA",
+                                     "WASHINGTON DC", ires$summary.random$STFIPS$ID)
+toprint = cbind(ires$summary.random$STFIPS[1:26, c(1,
+                                                   2, 4, 6)], ires$summary.random$STFIPS[-(1:26),
+                                                                                         c(1, 2, 4, 6)])
+colnames(toprint) = gsub("uant", "", colnames(toprint))
+knitr::kable(toprint, digits = 1, format = "latex")
+```
