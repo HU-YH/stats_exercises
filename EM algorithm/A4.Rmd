@@ -1,0 +1,132 @@
+---
+title: "A4"
+author: "Yuhan Hu"
+date: "2019/11/21"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\pagebreak
+
+# Q1
+
+## a.
+
+$\theta_1+\sum_{i=2}^{k}\phi_i=\theta_1+(\theta_2-\theta_1)+(\theta_3-\theta_2)+....+(\theta_k-\theta_{k-1})$
+
+All terms cancel out
+
+so $\theta_1+\sum_{i=2}^{k}\phi_i=\theta_k$
+
+## b.
+
+$\frac{\partial}{\partial\theta_1}(\sum_{i=1}^{n}(y_i-\theta_i)^2+\lambda\sum_{i=2}^{n}|\phi_i|)=\frac{\partial}{\partial\theta_1}\sum_{i=1}^{n}(y_i-\theta_i)^2$
+
+From a. we have $\theta_i=\theta_1+\sum_{j=2}^{n}\phi_j$
+
+$\frac{\partial}{\partial\theta_1}\sum_{i=1}^{n}(y_i-\theta_i)^2=\frac{\partial}{\partial\theta_1}(\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j))^2=-2\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)$
+
+(2) is minimized when the derivative reaches 0
+
+$-2\sum_{i=1}^{n}(y_i-\hat\theta_1-\sum_{j=2}^{n}\phi_j)=0$
+
+since $\hat\theta_1-\sum_{j=2}^{n}\phi_j=\hat\theta_1-\sum_{j=2}^{n}\hat\theta_j-\hat\theta_{i-1}=\hat\theta_i$
+
+so (2) is minimized when $\sum_{i=1}^{n}(y_i-\hat\theta_i)=0$
+
+## c.
+
+$\partial\lambda\sum|\theta_i-\theta_{i-1}|=\partial\lambda\sum|\phi_i|=\lambda\partial\sum|\phi_i|$
+
+$\partial|\phi_i|=1,-1,[-1,1]$given $\phi_i>0,\phi_i<0,\phi_i=0$ respectively
+
+so $\partial|\phi_i|\in[-\lambda,\lambda]$
+
+In addition, $\lambda\sum_{i=2}^n|\phi_i|$ can be written as $\lambda|\theta_i-\theta_{i-1}|+\lambda|\theta_{i+1}-\theta_{i}|$ for each $i$
+
+so $\partial\lambda\sum|\theta_i-\theta_{i-1}|=\partial(\lambda|\theta_i-\theta_{i-1}|+\lambda|\theta_{i+1}-\theta_{i}|)\in[-2\lambda,2\lambda]$
+
+therefore $\partial\lambda\sum|\theta_i-\theta_{i-1}|\in[-2\lambda,2\lambda]^n$
+
+## d.
+
+$\frac{\partial}{\partial\phi_j}(\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)^2+\lambda\sum_{i=2}^{n}|\phi_i|)=-2\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)+\lambda\partial|\phi_i|$
+
+$=-2\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)+[-\lambda,\lambda]$
+
+since we want the derivative to equal $0$, we have
+
+$-2\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)\in[-\lambda,\lambda]$
+
+$2\sum_{i=1}^{n}(y_i-\theta_1-\sum_{j=2}^{n}\phi_j)\in[-\lambda,\lambda]$
+
+Given $\hat\theta_1=...=\hat\theta_n=\bar y$
+
+we have $\sum_{i=1}^{n}y_i-\theta_i=n\bar y-n\theta_1=0$
+
+so$2\sum(y_i-\theta_1-\sum\phi_j)=2\sum_{i=1}^{n}\sum_{j=2}^{n}\phi_j\in[-\lambda,\lambda]$
+
+therefore $|\sum\sum\phi_j|\le\frac{\lambda}{2}$
+
+
+
+\pagebreak
+
+# Q2
+
+## a.
+
+This given pdf follows negative binomial distribution with $k=m,r=n,p=1-\kappa_\lambda(r)$
+
+mean of negative binomial distribution is $\frac{pr}{1-p}$, in this case it is $E_\lambda(M)=n(1-\kappa_\lambda(r)/\kappa_\lambda(r)$
+
+Negative binomial distribution mean proof:
+
+$PDF=\begin{pmatrix} k+r-1 \\ k \end{pmatrix}\times(1-p)^rp^k$
+
+$E(X)=\sum_{k=0}^{\infty} k\begin{pmatrix} k+r-1 \\ k \end{pmatrix}\times(1-p)^rp^k$
+
+$=\sum_{k=1}^{\infty}\frac{(k+r-1)!}{(k-1)!(r-1)!}p^k(1-p)^r$
+
+$=pr\sum_{k=1}^{\infty}\frac{(k+r-1)!}{(k-1)!r!}p^k(1-p)^r$
+
+let $k+r-1=n$
+
+then sum part of the above equation becomes$\sum_{n=r}^{\infty}\frac{n!}{(n-r)!r!}p^{n-r}(1-p)^r=\frac{1}{1-p}$
+
+so $=pr\sum_{k=1}^{\infty}\frac{(k+r-1)!}{(k-1)!r!}p^k(1-p)^r=\frac{pr}{1-p}$
+
+## b.
+
+$E_\lambda(\sum_{i=n+1}^{n+M}X_i|X_1=x_1,...,X_n=x_n)=E_\lambda[E_\lambda[\sum_{i=n+1}^{n+M}X_i|M=m]]$ by tower rule
+
+
+$=E_\lambda[E_\lambda[(X_{n+1}+...+X_{n+M})]]=E_\lambda[ME_\lambda(X)]$
+
+$=E_\lambda[M]E_\lambda[X_i|X_i\le r]$
+
+## c.
+
+```{r c2,eva = FALSE}
+n = 1317+239+42+14+4+4+1
+lambda = (1*1317+2*239+3*42+4*14+5*4+6*4+7*1)/n
+
+for (i in 1:1000){
+  k = 1-exp(-lambda)
+  M = n*(1-k)/k
+  lambda = (1*1317+2*239+3*42+4*14+5*4+6*4+7*1)/(n+M)
+  i = i+1
+}
+
+M
+lambda
+
+```
+
+Since this method did converge, this estimate is reasonable.

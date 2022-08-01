@@ -1,0 +1,82 @@
+#  Adapted from Condat (2013) IEEE Signal Processing Letters
+tvsmooth <- function(x,lambda) {
+              lambda <- lambda/2
+              n <- length(x)
+              xhat <- rep(0,n)
+              k <- 1
+              k0 <- 1
+              km <- 1
+              kp <- 1
+              vmin <- x[1] - lambda
+              vmax <- x[1] + lambda
+              umin <- lambda
+              umax <- -lambda
+              while (k < n) {
+                  if (x[k+1]+umin<vmin-lambda) {
+                     xhat[k0:km] <- vmin
+                     k <- km+1
+                     k0 <- k
+                     km <- k
+                     kp <- k
+                     vmin <- x[k]
+                     vmax <- x[k]+2*lambda
+                     umin <- lambda
+                     umax <- -lambda
+                     }
+                  else if (x[k+1]+umax>vmax+lambda) {
+                        xhat[k0:kp] <- vmax
+                        k <- kp+1
+                        k0 <- k
+                        km <- k
+                        kp <- k
+                        vmin <- x[k]-2*lambda
+                        vmax <- x[k]
+                        umin <- lambda
+                        umax <- -lambda
+                        }
+                   else {
+                        k <- k+1
+                        umin <- umin + x[k] - vmin
+                        umax <- umax + x[k] - vmax
+                        if (umin>=lambda) {
+                          vmin <- vmin + (umin-lambda)/(k-k0+1)
+                          umin <- lambda
+                          km <- k
+                          }
+                        if (umax<=-lambda) {
+                          vmax <- vmax + (umax+lambda)/(k-k0+1)
+                          umax <- -lambda
+                          kp <- k
+                          }
+                        }
+                if (k>=n) {
+                   if (umin<0) {
+                     xhat[k0:km] <- vmin
+                     k <- km+1
+                     k0 <- k
+                     km <- k
+                     vmin <- x[k]
+                     umin <- lambda
+                     umax <- x[k] + lambda - vmax
+                     if (k==n) xhat[n] <- vmin+umin
+                     }
+                   else if (umax>0) {
+                     xhat[k0:kp] <- vmax
+                     k <- kp+1
+                     k0 <- k
+                     kp <- k
+                     vmax <- x[k]  
+                     umax <- -lambda
+                     umin <- x[k] - lambda - vmin
+                     if (k==n) xhat[n] <- vmin+umin
+                     }
+                   else {
+                     xhat[k0:n] <- vmin + umin/(k-k0+1)
+                     }
+                 }
+                 }
+              xhat
+              }
+
+                                    
+
