@@ -1,0 +1,653 @@
+---
+title: "Analysis"
+author: "Yuhan Hu"
+date: "2020/2/29"
+output: 
+  pdf_document:
+    toc: true
+---
+
+# Research Question
+
+1. What characteristics of the users is associated with a higher rate of improvement for the health risk factors. 
+
+2. Is a higher frequency of usage of the platform (measured through the accumulation of points) associated with a general improvement in health as measured by the risk factors.
+
+Higher value of scores means better.
+
+# data management
+
+After EDA and further group discussion, I have refined the process of data cleaning
+
+## For research question 1
+
+```{r}
+#load data
+BLR_user_HRA <- read.csv('BLR_USER_HRA.csv',na.strings = c('NA','NULL'))
+colnames(BLR_user_HRA)[1]<-"UserId"
+BLR_user_HRA[,1] <- as.character(unlist(BLR_user_HRA[,1]))
+BLR_user_HRA$FinishedDate <- as.Date(BLR_user_HRA$FinishedDate)
+BLR_user_HRA$CreatedDate <- as.Date(BLR_user_HRA$CreatedDate)
+length(unique(BLR_user_HRA$UserId))
+#############################################################################
+
+#remove rows with N/A BLR column
+rmNA<-c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (is.na(BLR_user_HRA[i,][4])){
+    rmNA <- c(rmNA,i)
+  }
+}
+
+BLR_user_HRA <- BLR_user_HRA[-rmNA,]
+
+rm(rmNA)
+rm(i)
+
+#remove long interval
+#I can't understand why some entries took the users like more than 1 day to complete, so I removed all entries violate this
+#
+rmLongInterval1 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>1){
+    rmLongInterval1 <- c(rmLongInterval1,i)
+  }
+}
+length(rmLongInterval1)
+
+
+rmLongInterval7 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>7){
+    rmLongInterval7 <- c(rmLongInterval7,i)
+  }
+}
+length(rmLongInterval7)
+
+
+rmLongInterval14 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>14){
+    rmLongInterval14 <- c(rmLongInterval14,i)
+  }
+}
+length(rmLongInterval14)
+
+
+
+#There is no big difference between 
+
+#some user with duplicated rows may become user with only one entry after remove all invalid rows
+#so pick duplicated rows after remove all those invalid date point
+BLR_user_HRA_rmLongInterval <- BLR_user_HRA[-rmLongInterval1,]
+BLR_user_HRA_rmLongInterval_duplicated <- subset(BLR_user_HRA_rmLongInterval,
+                                                 duplicated(UserId)|duplicated(UserId,fromLast = TRUE))
+
+BLR_user_HRA_rmLongInterval_duplicated <- BLR_user_HRA_rmLongInterval_duplicated[,-c(5,14,17)]
+
+rm(rmLongInterval1)
+rm(rmLongInterval7)
+rm(rmLongInterval14)
+rm(i)
+rm(BLR_user_HRA_rmLongInterval)
+```
+
+For the first research quesiton, if I want to build a linear model, I need to calculate difference between the first and last entry for each user.
+
+```{r}
+library(dplyr)
+
+last <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(FinishedDate==max(FinishedDate))
+
+first <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(FinishedDate==min(FinishedDate))
+  
+length(unique(BLR_user_HRA_rmLongInterval_duplicated$UserId))
+nrow(last)
+#there must be something wrong, there are users put in duplicated entry in the same data
+#for those entries, we have no information about which entry was added in later
+#so I decide to randomly pick one entry 
+
+last <- last %>% group_by(UserId) %>% sample_n(1)
+first <- first %>% group_by(UserId) %>% sample_n(1)
+
+sorted_last <- arrange(last,by_group=UserId)
+sorted_first <- arrange(first,by_group=UserId)
+rm(first)
+rm(last)
+
+
+diff <- sorted_last
+diff$time_interval <- as.numeric(difftime(sorted_last$FinishedDate,sorted_first$FinishedDate,units = 'days'))
+#Found there are users that put in data points with same finished date, i.e. time_interval = 0
+#which means these data points are invalid and cant be used for analysis
+#no need to go back to the begining of data management
+#if a user with more than 2 data points return this problem
+#it means other data points of this user also have same finished, so all data points from this user are invalid
+non_zero_interval <- diff$time_interval!=0
+sorted_first <- sorted_first[non_zero_interval,]
+sorted_last <- sorted_last[non_zero_interval,]
+diff <- diff[non_zero_interval,]
+all(diff$time_interval!=0)
+rm(non_zero_interval)
+
+#all invalid data points removed
+#now column finished date and created date are useless
+diff <- diff[,-c(13,14)]
+sorted_first <- sorted_first[,-c(13,14)]
+sorted_last <- sorted_last[,-c(13,14)]
+
+#check if entries in both df are in the same order, if not, next step will be erroneous
+all(sorted_first$UserId == sorted_last$UserId)
+features <- colnames(sorted_first)
+```
+
+```{r,eval=FALSE}
+i=4
+for (i in length(features)){
+  diff[paste(features[i],'change',sep='_')] <- sorted_last[[features[i]]] - sorted_first[[features[i]]]
+}
+```
+
+Don't understand why the above loop does not work, it did the same thing as code in the following chunk
+
+
+```{r}
+
+diff[paste(features[4],'change',sep='_')] <- (sorted_last[[features[4]]] - sorted_first[[features[4]]])/diff$time_interval
+diff[paste(features[5],'change',sep='_')] <- (sorted_last[[features[5]]] - sorted_first[[features[5]]])/diff$time_interval
+diff[paste(features[6],'change',sep='_')] <- (sorted_last[[features[6]]] - sorted_first[[features[6]]])/diff$time_interval
+diff[paste(features[7],'change',sep='_')] <- (sorted_last[[features[7]]] - sorted_first[[features[7]]])/diff$time_interval
+diff[paste(features[8],'change',sep='_')] <- (sorted_last[[features[8]]] - sorted_first[[features[8]]])/diff$time_interval
+diff[paste(features[9],'change',sep='_')] <- (sorted_last[[features[9]]] - sorted_first[[features[9]]])/diff$time_interval
+diff[paste(features[10],'change',sep='_')] <- (sorted_last[[features[10]]] - sorted_first[[features[10]]])/diff$time_interval
+diff[paste(features[11],'change',sep='_')] <- (sorted_last[[features[11]]] - sorted_first[[features[11]]])/diff$time_interval
+diff[paste(features[12],'change',sep='_')] <- (sorted_last[[features[12]]] - sorted_first[[features[12]]])/diff$time_interval
+diff[paste(features[13],'change',sep='_')] <- (sorted_last[[features[13]]] - sorted_first[[features[13]]])/diff$time_interval
+diff[paste(features[14],'change',sep='_')] <- (sorted_last[[features[14]]] - sorted_first[[features[14]]])/diff$time_interval
+diff[paste(features[15],'change',sep='_')] <- (sorted_last[[features[15]]] - sorted_first[[features[15]]])/diff$time_interval
+diff[paste(features[16],'change',sep='_')] <- (sorted_last[[features[16]]] - sorted_first[[features[16]]])/diff$time_interval
+diff[paste(features[17],'change',sep='_')] <- (sorted_last[[features[17]]] - sorted_first[[features[17]]])/diff$time_interval
+diff[paste(features[18],'change',sep='_')] <- (sorted_last[[features[18]]] - sorted_first[[features[18]]])/diff$time_interval
+diff[paste(features[19],'change',sep='_')] <- (sorted_last[[features[19]]] - sorted_first[[features[19]]])/diff$time_interval
+diff[paste(features[20],'change',sep='_')] <- (sorted_last[[features[20]]] - sorted_first[[features[20]]])/diff$time_interval
+diff[paste(features[21],'change',sep='_')] <- (sorted_last[[features[21]]] - sorted_first[[features[21]]])/diff$time_interval
+#now the original value can be discarded
+diff <- diff[,-seq(4,length(sorted_first))]
+rm(sorted_first)
+rm(sorted_last)
+```
+
+Finish data preparation for regression model
+
+But there may be random effect between users
+
+```{r}
+
+mixed_preparation <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(min(FinishedDate)!=max(FinishedDate))
+
+
+unique_table <- table(mixed_preparation$UserId)
+length(unique_table)
+sum(unique_table > 2)
+sum(unique_table == 3)
+sum(unique_table == 4)
+sum(unique_table == 5)
+sum(unique_table > 5)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(time_interval = as.numeric(difftime(FinishedDate, lag(FinishedDate)), units='days'))
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(BLR_change = (BLRScore - lag(BLRScore, default = BLRScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Heart_change = (HeartScore - lag(HeartScore, default = HeartScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Respiratory_change = (RespiratoryScore - lag(RespiratoryScore, default = RespiratoryScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Gastrointestinal_change = (GastrointestinalScore - lag(GastrointestinalScore, 
+                                                                          default = GastrointestinalScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Diabetes_change = (DiabetesScore - lag(DiabetesScore, default = DiabetesScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Cancer_change = (CancerScore - lag(CancerScore, default = CancerScore[1]))/time_interval)
+
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(ArthritisPain_change = (ArthritisPainScore - lag(ArthritisPainScore, default = ArthritisPainScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(MentalHealth_change = (MentalHealthScore - lag(MentalHealthScore, default = MentalHealthScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(SocioFinancial_change = (SocialFinancialRelationshipScore -
+            lag(SocialFinancialRelationshipScore, default = SocialFinancialRelationshipScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Diet_change = (DietScore - lag(DietScore, default = DietScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(PhysicalActivity_change = (PhysicalActivityScore - lag(PhysicalActivityScore, 
+                                                                          default = PhysicalActivityScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(FinancialHealth_change = (FinancialHealthScore - lag(FinancialHealthScore, 
+                                                                        default = FinancialHealthScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Medication_change = (MedicationScore - lag(MedicationScore, default = MedicationScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Alcohol_change = (AlcoholScore - lag(AlcoholScore, default = AlcoholScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Sleep_change = (SleepScore - lag(SleepScore, default = SleepScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Stress_change = (StressScore - lag(StressScore, default = StressScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(Smoking_change = (SmokingScore - lag(SmokingScore, default = SmokingScore[1]))/time_interval)
+
+mixed_preparation <- mixed_preparation %>%
+   group_by(UserId) %>%
+   mutate(BMI_change = (BMI - lag(BMI, default = BMI[1]))/time_interval)
+
+
+mixed_preparation <- na.omit(mixed_preparation)
+mixed_preparation <- subset(mixed_preparation,time_interval!=0)
+unique_table <- table(mixed_preparation$UserId)
+unique_table <- unique_table[unique_table >= 3]
+unique_df <- as.data.frame(unique_table)
+mixed_preparation <- mixed_preparation[mixed_preparation$UserId %in% unique_df$Var1,]
+mixed_preparation <- mixed_preparation[,-c(4:23)]
+
+```
+
+
+```{r}
+mixed_preparation2 <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(min(FinishedDate)!=max(FinishedDate))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(BLR_change = BLRScore - lag(BLRScore, default = BLRScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Heart_change = HeartScore - lag(HeartScore, default = HeartScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Respiratory_change = RespiratoryScore - lag(RespiratoryScore, default = RespiratoryScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Gastrointestinal_change = GastrointestinalScore - lag(GastrointestinalScore, 
+                                                                          default = GastrointestinalScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Diabetes_change = DiabetesScore - lag(DiabetesScore, default = DiabetesScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Cancer_change = CancerScore - lag(CancerScore, default = CancerScore[1]))
+
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(ArthritisPain_change = ArthritisPainScore - lag(ArthritisPainScore, default = ArthritisPainScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(MentalHealth_change = MentalHealthScore - lag(MentalHealthScore, default = MentalHealthScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(SocioFinancial_change = SocialFinancialRelationshipScore -
+            lag(SocialFinancialRelationshipScore, default = SocialFinancialRelationshipScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Diet_change = DietScore - lag(DietScore, default = DietScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(PhysicalActivity_change = PhysicalActivityScore - lag(PhysicalActivityScore, 
+                                                                          default = PhysicalActivityScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(FinancialHealth_change = FinancialHealthScore - lag(FinancialHealthScore, 
+                                                                        default = FinancialHealthScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Medication_change = MedicationScore - lag(MedicationScore, default = MedicationScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Alcohol_change = AlcoholScore - lag(AlcoholScore, default = AlcoholScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Sleep_change = SleepScore - lag(SleepScore, default = SleepScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Stress_change = StressScore - lag(StressScore, default = StressScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Smoking_change = SmokingScore - lag(SmokingScore, default = SmokingScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(BMI_change = BMI - lag(BMI, default = BMI[1]))
+
+mixed_preparation2 <- na.omit(mixed_preparation2)
+unique_table <- table(mixed_preparation2$UserId)
+unique_table <- unique_table[unique_table >= 3]
+unique_df <- as.data.frame(unique_table)
+mixed_preparation2 <- mixed_preparation2[mixed_preparation2$UserId %in% unique_df$Var1,]
+mixed_preparation2 <- mixed_preparation2[,-c(4:23)]
+
+
+```
+
+## For research question 2
+
+```{r}
+BLR_user_HRA <- read.csv('BLR_USER_HRA.csv',na.strings = c('NA','NULL'))
+colnames(BLR_user_HRA)[1]<-"UserId"
+BLR_user_HRA[,1] <- as.character(unlist(BLR_user_HRA[,1]))
+
+p1_points_M <- read.csv("part1- points M.csv")
+colnames(p1_points_M)[1]<-"UserId"
+
+p1_points_R <- read.csv("part1- points R.csv")
+colnames(p1_points_R)[1]<-"UserId"
+
+p1_points_Z <- read.csv("part1- points Z copy.csv")
+colnames(p1_points_Z)[1]<-"UserId"
+
+p2_points_M <- read.csv("part2- points M copy.csv")
+colnames(p2_points_M)[1]<-"UserId"
+
+p2_points_R <- read.csv("part2- points R copy.csv")
+colnames(p2_points_R)[1]<-"UserId"
+
+p3_points_M <- read.csv("part3- points M.csv")
+colnames(p3_points_M)[1]<-"UserId"
+
+p3_points_R <- read.csv("part3- points R copy.csv")
+colnames(p3_points_R)[1]<-"UserId"
+
+colnames(p1_points_M) <- c('UserId','points','CreatedDate')
+colnames(p2_points_M) <- c('UserId','points','CreatedDate')
+colnames(p3_points_M) <- c('UserId','points','CreatedDate')
+points_M <- rbind(rbind(p1_points_M,p2_points_M),p3_points_M)
+rm(p1_points_M,p2_points_M,p3_points_M)
+
+colnames(p1_points_R) <- c('UserId','points','CreatedDate')
+colnames(p2_points_R) <- c('UserId','points','CreatedDate')
+colnames(p3_points_R) <- c('UserId','points','CreatedDate')
+points_R <- rbind(rbind(p1_points_R,p2_points_R),p3_points_R)
+rm(p1_points_R,p2_points_R,p3_points_R)
+
+colnames(p1_points_Z) <- c('UserId','points','CreatedDate')
+points_Z <- p1_points_Z
+rm(p1_points_Z)
+
+
+points_all <- rbind(points_M,points_R,points_Z)
+length(unique(points_all$UserId))
+length(unique(BLR_user_HRA$UserId))
+
+rm(points_M,points_R,points_Z)
+
+#not all users of the platform tried BLR score
+#remove those users does not try BLR system
+new_points <- subset(points_all, UserId%in%unique(diff$UserId))
+length(unique(new_points$UserId))
+#remove those users used BLR but haven't tried points system
+BLR_data_points <- subset(diff, UserId %in% unique(new_points$UserId))
+length(unique(BLR_data_points$UserId))
+
+points_arranged <- data.frame(unique(new_points$UserId))
+colnames(points_arranged) <- c('UserId')
+absolute_points_change <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(sum_points = sum(abs(points)))
+
+points_earned <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(points_earned = sum(points[points > 0]))
+
+points_used <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(points_used = sum(points[points < 0]))
+
+frequency <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(frequency = n())
+
+points_arranged <- merge(points_arranged,points_earned, by = 'UserId')
+points_arranged <- merge(points_arranged,points_used, by = 'UserId')
+points_arranged <- merge(points_arranged,absolute_points_change, by = 'UserId')
+points_arranged <- merge(points_arranged,frequency, by = 'UserId')
+
+points_ready <- points_arranged
+
+rm(points_earned,points_used,frequency,absolute_points_change,points_all,new_points,points_arranged)
+```
+
+# Model
+
+
+# Research Question 1
+
+## LASSO regression
+```{r,echo=TRUE}
+#do not need user Id at this point
+library(glmnet)
+BLR_data <- na.omit(diff[-c(1,2,3,4)])
+
+BLR_data <- na.omit(BLR_data)
+BLR_response <- as.matrix(BLR_data$BLRScore_change)
+BLR_predictor <- as.matrix(BLR_data[,-1])
+
+LASSO <- glmnet(BLR_predictor,BLR_response,family = 'gaussian')
+plot(LASSO,xvar='lambda',label =  TRUE)
+colnames(BLR_predictor)[c(9,10)]
+knitr::kable(as.matrix(coef(LASSO,s=exp(-3))),digits = 3,caption = 'coefficient estimate when lambda = 1')
+residual_fit<-lm(BLRScore_change ~ GastrointestinalScore_change+CancerScore_change+MentalHealthScore_change
+                 +DietScore_change+PhysicalActivityScore_change+FinancialHealthScore_change+MedicationScore_change
+                 +AlcoholScore_change+StressScore_change+SmokingScore_change,data=BLR_data)
+coef(residual_fit)
+plot(residual_fit)
+```
+
+## Backward/forward Selection
+
+```{r,echo=TRUE}
+library(MASS)
+fit <- lm(BLRScore_change ~ .,data = BLR_data)
+step <- stepAIC(fit, direction = 'both')
+summary(step)
+knitr::kable(coef(fit),caption = 'coefficeints estimate obtained by Backward/forward Selection')
+plot(fit)
+
+lmtest::lrtest(step,residual_fit)
+```
+
+
+## mixed model
+```{r,eval =FALSE}
+mixed_fit <- nlme::lme(BLR_change ~ Heart_change+Respiratory_change+Gastrointestinal_change+
+                         Diabetes_change+Cancer_change+ArthritisPain_change+MentalHealth_change+SocioFinancial_change+
+                         Diet_change+PhysicalActivity_change+FinancialHealth_change+Medication_change+Alcohol_change+
+                         Sleep_change+Stress_change+Smoking_change+BMI_change,random = ~1|UserId, data = mixed_preparation)
+
+qqnorm(resid(mixed_fit))
+knitr::kable(Pmisc::lmeTable(mixed_fit),digits = 3)
+```
+
+```{r}
+mixed_fit <- nlme::lme(BLR_change ~ Heart_change+Respiratory_change+Gastrointestinal_change+
+                         Diabetes_change+Cancer_change+MentalHealth_change+SocioFinancial_change+
+                         Diet_change+PhysicalActivity_change+FinancialHealth_change+Medication_change+Alcohol_change+
+                         Sleep_change+Stress_change+Smoking_change+BMI_change,random = ~1|UserId, data = mixed_preparation)
+
+qqnorm(resid(mixed_fit))
+knitr::kable(Pmisc::lmeTable(mixed_fit),digits = 3)
+```
+
+```{r, eval =FALSE}
+mixed_fit <- nlme::lme(BLR_change ~ Heart_change+Respiratory_change+Gastrointestinal_change+
+                         Diabetes_change+Cancer_change+ArthritisPain_change+MentalHealth_change+SocioFinancial_change+
+                         Diet_change+PhysicalActivity_change+FinancialHealth_change+Medication_change+Alcohol_change+
+                         Sleep_change+Stress_change+Smoking_change+BMI_change,random = ~1|UserId, data = mixed_preparation2)
+
+qqnorm(resid(mixed_fit))
+knitr::kable(Pmisc::lmeTable(mixed_fit),digits = 3)
+```
+
+```{r}
+mixed_fit <- nlme::lme(BLR_change ~ Heart_change+Respiratory_change+Gastrointestinal_change+
+                         Diabetes_change+Cancer_change+MentalHealth_change+SocioFinancial_change+
+                         Diet_change+PhysicalActivity_change+FinancialHealth_change+Medication_change+Alcohol_change+
+                         Sleep_change+Stress_change+Smoking_change,random = ~1|UserId, data = mixed_preparation2)
+
+qqnorm(resid(mixed_fit))
+knitr::kable(Pmisc::lmeTable(mixed_fit),digits = 3)
+```
+
+# Research Question 2
+
+```{r,echo=TRUE}
+
+boxplot(points_ready$frequency)
+points_BLR <- merge(points_ready, diff, by = 'UserId')
+points_BLR$BLRScore_change <- log(points_BLR$BLRScore_change+abs(min(points_BLR$BLRScore_change))+1)
+points_BLR$points_per_use <- points_BLR$sum_points/points_BLR$frequency
+outlier <- boxplot(points_BLR$frequency,plot = FALSE)$out
+points_BLR_rmOutlier <- points_BLR[-which(points_BLR$frequency %in% outlier),]
+
+
+model1 <- lm(BLRScore_change ~ points_per_use, data = points_BLR)
+summary(model1)
+plot(model1)
+```
+
+```{r}
+model1_rmOutlier <- lm(BLRScore_change ~ points_per_use, data = points_BLR_rmOutlier)
+summary(model1_rmOutlier)
+plot(model1_rmOutlier)
+```
+
+```{r,eval =FALSE}
+model2 <- lm(BLRScore_change ~ frequency,data = points_BLR)
+summary(model2)
+plot(model2)
+#qqnorm(sort(residuals(model1))[-c(1:400,seq(length(residuals(model1))-400,length(residuals(model1))))])
+
+model2_rmOutlier <- lm(BLRScore_change ~ frequency,data = points_BLR_rmOutlier)
+summary(model2_rmOutlier)
+plot(model2_rmOutlier)
+```
+
+```{r,eval =FALSE}
+model3 <- lm(BLRScore_change ~ points_earned,data = points_BLR)
+summary(model3)
+plot(model3)
+
+model3_rmOutlier <- lm(BLRScore_change ~ points_earned,data = points_BLR_rmOutlier)
+summary(model3_rmOutlier)
+plot(model3_rmOutlier)
+
+```
+
+```{r,eval =FALSE}
+
+model4 <- lm(BLRScore_change ~ points_used,data = points_BLR)
+summary(model4)
+plot(model4)
+
+model4_rmOutlier <- lm(BLRScore_change ~ points_used,data = points_BLR_rmOutlier)
+summary(model4_rmOutlier)
+plot(model4_rmOutlier)
+
+```
+
+
+```{r,eval =FALSE}
+
+model5 <- lm(BLRScore_change ~ sum_points,data = points_BLR)
+summary(model5)
+plot(model5)
+
+model5_rmOutlier <- lm(BLRScore_change ~ sum_points,data = points_BLR_rmOutlier)
+summary(model5_rmOutlier)
+plot(model5_rmOutlier)
+
+```
+
+```{r,eval =FALSE}
+model6 <- lm(BLRScore_change ~ points_per_use+sum_points+frequency, data = points_BLR)
+summary(model6)
+plot(model6)
+```
+
+```{r}
+model6_rmOutlier <- lm(BLRScore_change ~ points_per_use+sum_points+frequency, data = points_BLR_rmOutlier)
+summary(model6_rmOutlier)
+plot(model6_rmOutlier)
+
+lmtest::lrtest(model1,model6)
+```
+
+# Interpretation
+
+## Research Question 1
+
+Without sufficient information, it's hard to decide what covariates are supposed to be removed. So I decided to let algorithm do the variable selection. Two models are obtained by using LASSO and backward/forward selection. By LASSO, a simpler model are obtained. Choice of lambda are determined with respect to the graph. Since backward/forward selectio returns full model, I want a simpler model from LASSO and compre these two models, so I picked a value of lambda that may elinminate several covariates, then use likelihod ratio test to compare these two model. Based on the p-value of likelihood ratio test, null hypothesis rejected;thus we prefer the simpler model. However, recall the research question **What characteristics of the users is associated with a higher rate of improvement for the health risk factors.**, we concern more about which covariate has greatest coefficient rather than the exact value of coefficient. In terms of this question, both model returns same result, change in physical activity has the greatest impact on change in BLR score. In addition, mixed model was built, the mixed model using data normalized with respect to time_interval shows a different result. While the mixed model without such normalization shows similar result. However, both model shows that $\sigma^2/\ (\sigma^2+\tau^2)=0$, which means the random effect almost explain no variability in models, thus the mixed model can be ignored.
+
+## Research Question 2
+
+Though all covariates has a negative coefficients, the value of coefficients are very close to zero and the p-value is not significant, which suggest that the coefficient are actually zero and the corresponding covariate has no effect on response variable BLRScore_change. Then added a new covariates, points_per_use, stands for average changes in account points(either use or earn) with respect to frequency of using the platform. The coefficient are negative and significant but close to zero.
+This means increase in average points change will lead to BLR score decrease. A reasonble interpretation of this coefficient is given here. High averge points change means more time spends on electronical device thus less physical activity, therefore BLR decrease. Alternatively, spending more time on reward from BLR platform may imply a bad financial status, so a lower financial score, which has a postive coefficient refer to research question 1; thus decrease BLR score. Nonetheless, since the  value is extremely close to zero, impact of platform usage on BLR scores is not so significant that requires attention.
+
+In conclusion, change in physical activity has the greatest impact on change in BLR, and frequency of usage of platform has no effect on BLR change.
+
+I set most output to echo = FALSE, it can be viewed by run the code.

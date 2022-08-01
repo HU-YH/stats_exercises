@@ -1,0 +1,559 @@
+---
+title: "Impact of improvement in user's characterstics and usage of BestLifeReward platform on BestLifeReward health score improvement"
+author: "Yuhan Hu"
+date: "2020/04/05"
+output: pdf_document
+bibliography: Citation.bib
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message = FALSE, warning = FALSE, eval = TRUE)
+```
+
+# Abstract
+
+While online health assessment apps are getting popular, their effectiveness can be improved and usefulness requires further investigation. This report was based on data collected from the platform developed by BestLifeReward, which is an online health assessment platform for company emplyees. Primarily, We want to investigate improvement in what characteristics of users had greatest impact on rate of change of health status, which is represented by an overall health score, BLR score, in this analysis. Furthermore, we are also interested in association between platform usage frequency and health improvement. Here we report that improvement in physical activity score, diet score, financial health score, stress score, smoking score and medication score are positively related to BLR score improvement. In addition, there is no evidence showing higher platform usage frequency are related to general health improvement.
+
+\pagebreak
+
+# Introduction
+
+An increasing number of individuals are using online platform for health guidance and assessment nowadays. By utilizing these tools, users may evaluate personal health status by recording health-related aspects, and get guidance for living healthier. However, quality of these platform require further study.[@grundy2016challenges]
+
+In this report, we focused on the online platform for employee health assessment provided by BestLifeRewarded Innvations. This platform collaborate with employers to provide resources and programs which helps employees manage their health status. On this platform, users can evaluating personal health status by completing survey on aspects like individual activities(e.g. physical activities) and health-related factors(e.g. weight and height). Based on survey results, the platform will calculate an overall health score, BLR score, and provide guidance for healthy life behaviour for users. Also, in order to motivate usage of platform, users can earn reward points when participating in platform activities. We were primarily interested in what characteristics of users were associated with higher rate of overall health improvement. Or in another word, how does changes in those characteristics affect BLR score rate of change. Answer to this question can help the platform provide better service by focusing more on those characteristics. In addition, we also investigated whether a higher frequency of platform usage would lead to a higher rate of overall health improvement for the sake of proving usefulness of the platform.
+
+This report is stuctured to present analysis process and result about these two research question as well as discussion about limitations and future directions. In method section, we discussed about how the platform works, data summary and manipulation as well as statiscal analysis. In result section, result of the study are provided, illustrated by tables and plots. Conclusion of major findings, potential question underlying this analysis and possible direction for future research are in discussion section.
+
+# Method
+
+```{r,results='hide'}
+#load data
+BLR_user_HRA <- read.csv('BLR_USER_HRA.csv',na.strings = c('NA','NULL'))
+colnames(BLR_user_HRA)[1]<-"UserId"
+BLR_user_HRA[,1] <- as.character(unlist(BLR_user_HRA[,1]))
+BLR_user_HRA$FinishedDate <- as.Date(BLR_user_HRA$FinishedDate)
+BLR_user_HRA$CreatedDate <- as.Date(BLR_user_HRA$CreatedDate)
+length(unique(BLR_user_HRA$UserId))
+#############################################################################
+
+#remove rows with N/A BLR column
+rmNA<-c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (is.na(BLR_user_HRA[i,][4])){
+    rmNA <- c(rmNA,i)
+  }
+}
+
+BLR_user_HRA <- BLR_user_HRA[-rmNA,]
+length(rmNA)
+rm(rmNA)
+rm(i)
+
+#remove long interval
+#I can't understand why some entries took the users like more than 1 day to complete, so I removed all entries violate this
+#
+rmLongInterval1 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>1){
+    rmLongInterval1 <- c(rmLongInterval1,i)
+  }
+}
+length(rmLongInterval1)
+
+
+rmLongInterval7 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>7){
+    rmLongInterval7 <- c(rmLongInterval7,i)
+  }
+}
+length(rmLongInterval7)
+
+
+rmLongInterval14 <- c()
+for(i in 1:nrow(BLR_user_HRA)){
+  if (as.numeric(difftime(BLR_user_HRA$FinishedDate[i], BLR_user_HRA$CreatedDate[i],units='auto'))>14){
+    rmLongInterval14 <- c(rmLongInterval14,i)
+  }
+}
+length(rmLongInterval14)
+
+
+
+#There is no big difference between 
+
+#some user with duplicated rows may become user with only one entry after remove all invalid rows
+#so pick duplicated rows after remove all those invalid date point
+BLR_user_HRA_rmLongInterval <- BLR_user_HRA[-rmLongInterval1,]
+BLR_user_HRA_rmLongInterval_duplicated <- subset(BLR_user_HRA_rmLongInterval,
+                                                 duplicated(UserId)|duplicated(UserId,fromLast = TRUE))
+
+BLR_user_HRA_rmLongInterval_duplicated <- BLR_user_HRA_rmLongInterval_duplicated[,-c(5,14,17)]
+BLR_user_HRA_rmLongInterval_duplicated$Gender <- factor(BLR_user_HRA_rmLongInterval_duplicated$Gender)
+BLR_user_HRA_rmLongInterval_duplicated$YearOfBirth <- 2020-BLR_user_HRA_rmLongInterval_duplicated$YearOfBirth
+colnames(BLR_user_HRA_rmLongInterval_duplicated)[3] <- 'Age' 
+
+write.csv(rmLongInterval1,file='altered entries.csv')
+write.csv(BLR_user_HRA_rmLongInterval, file = 'user with only one valid entry.csv')
+
+rm(rmLongInterval1)
+rm(rmLongInterval7)
+rm(rmLongInterval14)
+rm(i)
+rm(BLR_user_HRA_rmLongInterval)
+```
+
+```{r,results = 'hide'}
+library(dplyr)
+
+last <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(FinishedDate==max(FinishedDate))
+
+first <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(FinishedDate==min(FinishedDate))
+  
+length(unique(BLR_user_HRA_rmLongInterval_duplicated$UserId))
+nrow(last)
+#there must be something wrong, there are users put in duplicated entry in the same data
+#for those entries, we have no information about which entry was added in later
+#so I decide to randomly pick one entry 
+
+last <- last %>% group_by(UserId) %>% sample_n(1)
+first <- first %>% group_by(UserId) %>% sample_n(1)
+
+sorted_last <- arrange(last,by_group=UserId)
+sorted_first <- arrange(first,by_group=UserId)
+rm(first)
+rm(last)
+
+
+diff <- sorted_last
+diff$time_interval <- as.numeric(difftime(sorted_last$FinishedDate,sorted_first$FinishedDate,units = 'days'))
+#Found there are users that put in data points with same finished date, i.e. time_interval = 0
+#which means these data points are invalid and cant be used for analysis
+#no need to go back to the begining of data management
+#if a user with more than 2 data points return this problem
+#it means other data points of this user also have same finished, so all data points from this user are invalid
+non_zero_interval <- diff$time_interval!=0
+sorted_first <- sorted_first[non_zero_interval,]
+sorted_last <- sorted_last[non_zero_interval,]
+diff <- diff[non_zero_interval,]
+all(diff$time_interval!=0)
+rm(non_zero_interval)
+
+#all invalid data points removed
+#now column finished date and created date are useless
+diff <- diff[,-c(13,14)]
+sorted_first <- sorted_first[,-c(13,14)]
+sorted_last <- sorted_last[,-c(13,14)]
+
+#check if entries in both df are in the same order, if not, next step will be erroneous
+all(sorted_first$UserId == sorted_last$UserId)
+features <- colnames(sorted_first)
+```
+
+
+```{r,results='hide'}
+
+diff[paste(features[4],'change',sep='_')] <- (sorted_last[[features[4]]] - sorted_first[[features[4]]])/diff$time_interval
+diff[paste(features[5],'change',sep='_')] <- (sorted_last[[features[5]]] - sorted_first[[features[5]]])/diff$time_interval
+diff[paste(features[6],'change',sep='_')] <- (sorted_last[[features[6]]] - sorted_first[[features[6]]])/diff$time_interval
+diff[paste(features[7],'change',sep='_')] <- (sorted_last[[features[7]]] - sorted_first[[features[7]]])/diff$time_interval
+diff[paste(features[8],'change',sep='_')] <- (sorted_last[[features[8]]] - sorted_first[[features[8]]])/diff$time_interval
+diff[paste(features[9],'change',sep='_')] <- (sorted_last[[features[9]]] - sorted_first[[features[9]]])/diff$time_interval
+diff[paste(features[10],'change',sep='_')] <- (sorted_last[[features[10]]] - sorted_first[[features[10]]])/diff$time_interval
+diff[paste(features[11],'change',sep='_')] <- (sorted_last[[features[11]]] - sorted_first[[features[11]]])/diff$time_interval
+diff[paste(features[12],'change',sep='_')] <- (sorted_last[[features[12]]] - sorted_first[[features[12]]])/diff$time_interval
+diff[paste(features[13],'change',sep='_')] <- (sorted_last[[features[13]]] - sorted_first[[features[13]]])/diff$time_interval
+diff[paste(features[14],'change',sep='_')] <- (sorted_last[[features[14]]] - sorted_first[[features[14]]])/diff$time_interval
+diff[paste(features[15],'change',sep='_')] <- (sorted_last[[features[15]]] - sorted_first[[features[15]]])/diff$time_interval
+diff[paste(features[16],'change',sep='_')] <- (sorted_last[[features[16]]] - sorted_first[[features[16]]])/diff$time_interval
+diff[paste(features[17],'change',sep='_')] <- (sorted_last[[features[17]]] - sorted_first[[features[17]]])/diff$time_interval
+diff[paste(features[18],'change',sep='_')] <- (sorted_last[[features[18]]] - sorted_first[[features[18]]])/diff$time_interval
+diff[paste(features[19],'change',sep='_')] <- (sorted_last[[features[19]]] - sorted_first[[features[19]]])/diff$time_interval
+diff[paste(features[20],'change',sep='_')] <- (sorted_last[[features[20]]] - sorted_first[[features[20]]])/diff$time_interval
+diff[paste(features[21],'change',sep='_')] <- (sorted_last[[features[21]]] - sorted_first[[features[21]]])/diff$time_interval
+#now the original value can be discarded
+diff <- diff[,-seq(4,length(sorted_first))]
+rm(sorted_first)
+rm(sorted_last)
+```
+
+```{r, results = 'hide'}
+mixed_preparation2 <- BLR_user_HRA_rmLongInterval_duplicated %>%
+  group_by(UserId) %>%
+  filter(min(FinishedDate)!=max(FinishedDate))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(BLR_change = BLRScore - lag(BLRScore, default = BLRScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Heart_change = HeartScore - lag(HeartScore, default = HeartScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Respiratory_change = RespiratoryScore - lag(RespiratoryScore, default = RespiratoryScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Gastrointestinal_change = GastrointestinalScore - lag(GastrointestinalScore, 
+                                                                          default = GastrointestinalScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Diabetes_change = DiabetesScore - lag(DiabetesScore, default = DiabetesScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Cancer_change = CancerScore - lag(CancerScore, default = CancerScore[1]))
+
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(ArthritisPain_change = ArthritisPainScore - lag(ArthritisPainScore, default = ArthritisPainScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(MentalHealth_change = MentalHealthScore - lag(MentalHealthScore, default = MentalHealthScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(SocioFinancial_change = SocialFinancialRelationshipScore -
+            lag(SocialFinancialRelationshipScore, default = SocialFinancialRelationshipScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Diet_change = DietScore - lag(DietScore, default = DietScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(PhysicalActivity_change = PhysicalActivityScore - lag(PhysicalActivityScore, 
+                                                                          default = PhysicalActivityScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(FinancialHealth_change = FinancialHealthScore - lag(FinancialHealthScore, 
+                                                                        default = FinancialHealthScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Medication_change = MedicationScore - lag(MedicationScore, default = MedicationScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Alcohol_change = AlcoholScore - lag(AlcoholScore, default = AlcoholScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Sleep_change = SleepScore - lag(SleepScore, default = SleepScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Stress_change = StressScore - lag(StressScore, default = StressScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(Smoking_change = SmokingScore - lag(SmokingScore, default = SmokingScore[1]))
+
+mixed_preparation2 <- mixed_preparation2 %>%
+   group_by(UserId) %>%
+   mutate(BMI_change = BMI - lag(BMI, default = BMI[1]))
+
+mixed_preparation2 <- na.omit(mixed_preparation2)
+unique_table <- table(mixed_preparation2$UserId)
+unique_table <- unique_table[unique_table >= 3]
+unique_df <- as.data.frame(unique_table)
+mixed_preparation2 <- mixed_preparation2[mixed_preparation2$UserId %in% unique_df$Var1,]
+mixed_preparation2 <- mixed_preparation2[,-c(4:23)]
+
+
+```
+
+```{r,results = 'hide'}
+BLR_user_HRA <- read.csv('BLR_USER_HRA.csv',na.strings = c('NA','NULL'))
+colnames(BLR_user_HRA)[1]<-"UserId"
+BLR_user_HRA[,1] <- as.character(unlist(BLR_user_HRA[,1]))
+
+p1_points_M <- read.csv("part1- points M.csv")
+colnames(p1_points_M)[1]<-"UserId"
+
+p1_points_R <- read.csv("part1- points R.csv")
+colnames(p1_points_R)[1]<-"UserId"
+
+p1_points_Z <- read.csv("part1- points Z copy.csv")
+colnames(p1_points_Z)[1]<-"UserId"
+
+p2_points_M <- read.csv("part2- points M copy.csv")
+colnames(p2_points_M)[1]<-"UserId"
+
+p2_points_R <- read.csv("part2- points R copy.csv")
+colnames(p2_points_R)[1]<-"UserId"
+
+p3_points_M <- read.csv("part3- points M.csv")
+colnames(p3_points_M)[1]<-"UserId"
+
+p3_points_R <- read.csv("part3- points R copy.csv")
+colnames(p3_points_R)[1]<-"UserId"
+
+colnames(p1_points_M) <- c('UserId','points','CreatedDate')
+colnames(p2_points_M) <- c('UserId','points','CreatedDate')
+colnames(p3_points_M) <- c('UserId','points','CreatedDate')
+points_M <- rbind(rbind(p1_points_M,p2_points_M),p3_points_M)
+rm(p1_points_M,p2_points_M,p3_points_M)
+
+colnames(p1_points_R) <- c('UserId','points','CreatedDate')
+colnames(p2_points_R) <- c('UserId','points','CreatedDate')
+colnames(p3_points_R) <- c('UserId','points','CreatedDate')
+points_R <- rbind(rbind(p1_points_R,p2_points_R),p3_points_R)
+rm(p1_points_R,p2_points_R,p3_points_R)
+
+colnames(p1_points_Z) <- c('UserId','points','CreatedDate')
+points_Z <- p1_points_Z
+rm(p1_points_Z)
+
+
+points_all <- rbind(points_M,points_R,points_Z)
+length(unique(points_all$UserId))
+length(unique(BLR_user_HRA$UserId))
+
+rm(points_M,points_R,points_Z)
+
+#not all users of the platform tried BLR score
+#remove those users does not try BLR system
+new_points <- subset(points_all, UserId%in%unique(diff$UserId))
+length(unique(new_points$UserId))
+#remove those users used BLR but haven't tried points system
+BLR_data_points <- subset(diff, UserId %in% unique(new_points$UserId))
+length(unique(BLR_data_points$UserId))
+
+points_arranged <- data.frame(unique(new_points$UserId))
+colnames(points_arranged) <- c('UserId')
+absolute_points_change <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(sum_points = sum(abs(points)))
+
+points_earned <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(points_earned = sum(points[points > 0]))
+
+points_used <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(points_used = sum(points[points < 0]))
+
+frequency <- new_points %>% 
+  group_by(UserId) %>% 
+  summarise(frequency = n())
+
+points_arranged <- merge(points_arranged,points_earned, by = 'UserId')
+points_arranged <- merge(points_arranged,points_used, by = 'UserId')
+points_arranged <- merge(points_arranged,absolute_points_change, by = 'UserId')
+points_arranged <- merge(points_arranged,frequency, by = 'UserId')
+
+points_ready <- points_arranged
+
+rm(points_earned,points_used,frequency,absolute_points_change,points_all,new_points,points_arranged)
+```
+
+## Data collection, summary and Manipulation
+
+Data used for this study was collected from users on BestLifeReward platform. All participants came from one of three companies. Based on informaiton collected from users, such as individual activities(sleeping, nutrition, physical activities, etc.) and health-related factors(height, weight, stress level, etc.), scores are evaluated for health-related aspects such as gastrointestinal score, cancer score, mental health score, diet score, physical activity score, financial health score, medication score, alcohol score, stress score, smoking score, heart score, respiratory score, diabetes score, arthritis pain score, Social financial relationship score, sleep score and BMI. An overall health score, BLR scores will be calculated based on those health risk factors. 
+
+In our original dataset, there are 170965 data points in total. 32197 entries are removed because they have N/A for at least one feature. User can alter data entries after created. Dates of creation and last alteration were recorded as created date and finished date, respectively. However, if a data entry was altered several days after created, this data is unlikely to reflect a concise health state of the user. Therefore, we remove all data points whose created date is not the same as finished date. At this step, additional 15370 data points are removed. 
+
+Recall the first research question, chronological changes between data points from same user was the data of interest. So we did not use original value for analysis. Instead, for each user, we subtracted values in the first entry by values in the last entry(chronological order), then divided the result by time difference between this two entry. In addition, if a user only had one valid entry, such subtraction can not be performed. Therefore, we removed users with only one valid entry before subtraction and normalization. Additional 83409 data entries are removed at this step. After remove all this data points, there are 72186 entries left. In addition we found there are users who input multiple entries on one day. Validity of these entries are questionable; thus we removed those data. 2702 entries removed at this step. There were 69484 original data points from 24866 unique users after cleaning. This complete data preparation for linear regression model of research question 1. Among these users, about 2/3 are female, and most of them are 30-60 years old.
+
+```{r}
+par(mfrow = c(1,2))
+plot(diff$Gender, main = 'Gender of users')
+hist(diff$Age, main = 'Age of users',xlab='Age')
+```
+
+We also built a dataset for linear mixed model of research quesiton 1. Instead of substracting first entry from last entry, here we subtract second last entry from last entry, then third last entry from second last entry, all the way to the first entry.
+
+For the second research question, since **frequency of platform usage** is not clearly defined by the collaborator, we obtain several different dataset based on distince definition of **frequency of platform usage**:
+
+1. Represent frequency of platform usage as sum of accumulation of points. i.e. added up total points earned for each user
+
+2. Represent frequency of platform usage as sum of points spent. i.e. added up total points spent for each user
+
+3. Represent frequency of platform usage as absolute change in points. i.e. add absolute value of total points spent to total points earned.
+
+4.Represent frequency of platform usage as ratio of sum of accumulaiton of points to number of platform usage. i.e. divided total points earned by number of platform usage.
+
+
+
+## What characteristics are related to higher rate of BLR score change?
+
+In our data, one participant may contribute to multiple data points. Apparently, observations from same participant are not independent. In addition, homoscedasticity assumption of linear regression may also be violated. Therefore, we built a linear mixed model first. However, based on result from linear mixed model, percentage of variability explained by random effect are too small to be substantial.(i.e. given 3 digits, $\frac{\sigma^2}{\sigma^2+\tau^2}=0$)Therefore, we decided linear mixed model was overcomplicating for this study and not supposed to be used here.
+
+```{r mixed model}
+mixed_fit <- nlme::lme(BLR_change ~ Heart_change+Respiratory_change+Gastrointestinal_change+
+                         Diabetes_change+Cancer_change+MentalHealth_change+SocioFinancial_change+
+                         Diet_change+PhysicalActivity_change+FinancialHealth_change+Medication_change+Alcohol_change+
+                         Sleep_change+Stress_change+Smoking_change+Gender+Age,random = ~1|UserId, data = mixed_preparation2)
+
+#qqnorm(resid(mixed_fit))
+knitr::kable(Pmisc::lmeTable(mixed_fit),digits = 3, caption = 'Linear Mixed Model for Research Question 1', format = 'pandoc')
+```
+
+Changes in BLR score is the variable of interest, thus the response variable. All other variables are potential predictor of interest. Since we do not have additional information about covariates, there is no clue for selecting significant features requried by our model. Therefore, we decide to use LASSO shrinkage method to choose features automatically. Since we do not have additional information about possible interaction between potential variables, no interaction terms are added into the model.
+
+As for tunning parameter $\lambda$ of LASSO shrinkage, we chose $\lambda_{1se}$(second vertical dotted line) because this $\lambda$ value gives a model that error is within one standard error of the minimum, which is the most regularized model. [@friedman2010regularization, glmnet package vignette]
+
+```{r}
+#do not need user Id at this point
+library(glmnet)
+BLR_data <- na.omit(diff[-c(1,2,3,4)])
+
+BLR_data <- na.omit(BLR_data)
+BLR_response <- as.matrix(BLR_data$BLRScore_change)
+BLR_predictor <- as.matrix(BLR_data[,-1])
+#BLR_data_vif<-cbind(BLR_data[,-c(4,8)],BLR_predictor[,4]+BLR_predictor[,8])
+#colnames(BLR_data_vif)[length(BLR_data_vif)] <- 'sum48'
+
+LASSO <- glmnet(BLR_predictor,BLR_response,family = 'gaussian')
+cvLASSO <- cv.glmnet(BLR_predictor,BLR_response,family = 'gaussian')
+
+plot(cvLASSO, main = 'Cross-Validation Curve')
+```
+
+By LASSO shrinkage, changes in gastrointestinal score, cancer score, mental health score, diet score, physical activity score, financial health score, medication score, alcohol score, stress score and smoking score are included in the model, while changes in heart score, respiratory score, diabetes score, arthritis pain score, social financial relationship score, sleep score and BMI are removed from the model.
+
+```{r}
+
+LASSOCoef<- t(as.data.frame(t(as.matrix(coef(LASSO,s=cvLASSO$lambda.1se))))[,as.matrix(coef(LASSO,s=cvLASSO$lambda.1se)!=0)])
+LASSOCoef <- as.data.frame(LASSOCoef)
+colnames(LASSOCoef) <- 'Coefficient'
+
+#knitr::kable(LASSOCoef,digits = 3,caption = 'Coefficient of health-risk factors by LASSO',format = 'pandoc')
+
+
+```
+
+
+
+## Is a higher frequency of usage of the platform associated with a general improvement in health as measured by the risk factors?
+
+As for this research question, since the idea of **frequency** was not clearly defined, we have several potential predictors such as sum of points earned, sum of points spent, times of platform usage and ratio of sum of points earned to times of platform usage. Response variable was the same as previous research question, change in BLR scores. 
+
+Linear regression models has been fitted for each predictors individually, and only ratio of sum of points earning to times of platform usage returns a coefficient with significant p-value.
+
+```{r}
+
+#boxplot(points_ready$frequency)
+points_BLR <- merge(points_ready, diff, by = 'UserId')
+points_BLR$BLRScore_change <- log(points_BLR$BLRScore_change+abs(min(points_BLR$BLRScore_change))+1)
+points_BLR$points_per_use <- points_BLR$sum_points/points_BLR$frequency
+outlier <- boxplot(points_BLR$frequency,plot = FALSE)$out
+points_BLR_rmOutlier <- points_BLR[-which(points_BLR$frequency %in% outlier),]
+
+
+model1 <- lm(BLRScore_change ~ points_per_use, data = points_BLR)
+#summary(model1)
+knitr::kable(coef(model1), col.names = 'coefficient', caption = 'model with ratio of sum of points earning to times of platform usage as predictor', format = 'pandoc')
+```
+
+```{r,eval =TRUE}
+model2 <- lm(BLRScore_change ~ points_earned,data = points_BLR)
+knitr::kable(coef(model2), col.names = 'coefficient', caption = 'model with total points earned as predictor', format = 'pandoc')
+
+```
+
+```{r,eval =TRUE}
+
+model3 <- lm(BLRScore_change ~ points_used,data = points_BLR)
+knitr::kable(coef(model3), col.names = 'coefficient', caption = 'model with total point spent as predictor', format = 'pandoc')
+
+```
+
+
+```{r,eval =TRUE}
+
+model4 <- lm(BLRScore_change ~ sum_points,data = points_BLR)
+knitr::kable(coef(model4), col.names = 'coefficient', caption = 'model with absolute points change as predictor', format = 'pandoc')
+
+```
+
+# Result
+
+## Research Question 1
+
+As mentioned in method section, we are using LASSO regression to do model selection for this question. After shrinkage with apporiate $\lambda$, we found a final model with 11 predictors, which included changes in gastrointestinal score, cancer score, mental healthscore, diet score, physical activity score, financial health score, medication score, alcohol score, stress score and smoking score will stay in the model for inference. Adjusted $R^2$ is 0.808, which suggest that $80.8%$ of variation in BLR improvement was explained by this model.
+
+Refer to the coefficient Table, changes in physical activity scores has the greatest coefficient, 2.156, which indicate that improvement in physical activity scores was associated with the highest improvement rate of BLR score. Or more specifically, increase physical activity score by 1 unit will increase BLR score by 2.156 units on average, given other predictors did not change. Improvement of alcohol score, medication score, smoking score, stress score, financial health score and diet score also had positive coefficient, which indicate improvement in these scores led to increase BLR score. Changes in cancer score, gastrointestinal score and mentalhealth score had negative coefficient. Therefore, the larger these 3 scores, the smaller the BLR score, which indicates a worse health condition. Among these 3 scores, changes in mental health score has the largest absolute value, 0.541, which indicate increase mental health score by 1 unit will reduce BLR score by 0.541 unit on average, given other predictors did not change.
+
+Both negative effect predictors and positive predictors are given in increasing order of effect on BLR score change.(i.e. in increasing order of absolute value of corresponding coefficients.)
+
+```{r}
+postfit <- lm(BLRScore_change ~ GastrointestinalScore_change+CancerScore_change+MentalHealthScore_change+
+                         DietScore_change+PhysicalActivityScore_change+FinancialHealthScore_change+
+                         MedicationScore_change+AlcoholScore_change+StressScore_change+SmokingScore_change,data = BLR_data)
+
+knitr::kable(coef(postfit),digits = 3,caption = 'Post-LASSO Coefficient of health-risk factors',format = 'pandoc')
+```
+
+## Research Question 2
+
+As mentioned and illustrated above, most potential predictors do not return a significant coefficient, which indicates that those predictors did not affect changes in BLR scores. Moreover, value of the only significant coefficient, coefficient of ratio of sum of points earning to times of platform usage, is close to 0, and the corresponding p-value is at the boundary between significant and non-significant. Therefore, the answer to the second research question is negative. Higher frequency of platform usage does not associate with a general improvement in BLR score.
+
+
+
+# Discussion
+
+This analysis utlize LASSO shrinkage to select features for determining association between improvement in health risk factors and BLR score improvement. $\lambda$ we chose value for LASSO led to the most regularized model whose error is within one standard error of the minimum. Result of post selection inference shows that BLR score improvement is positively related to alcohol score, medication score, smoking score, stress score, financial health score, diet score and physical activity score. The improvement of users' overall health status is negatively associated with increasing cancer score, gastrointestinal score and mentalhealth score. Both positive and negative effects were listed in increasing absolute value order. As for relationship between platform usage frequency and BLR score improvement, we attempted several linear model with various definition of platform usage frequency, and obtained consistent conclusion from all models. Refer to our result, there was no evidence shows that higher platform usage frequency was associated with general improvment in BLR score.
+
+Moreover, there are several aspects worth mentioning about this analysis. First and the most important, residual plot of both models are heavily tailed, we have tried various method like outlier removal and data transformation(e.g. log transformation), but the problem cannot be solved. 
+
+```{r}
+qqnorm(resid(postfit),main = 'Residual normal Q-Q plot for model 1')
+qqnorm(resid(model1), main  = 'Residual normal Q-Q plot for model 2')
+```
+
+Model-specific discussion are given below.
+
+## Model 1
+
+1. As we have mentioned, variability explained by personal difference in linear mixed model is so small that can be ignored. For furture analysis, this result can be helpful during model selection.
+
+2. Process of predictor selection was done by LASSO algorithm automatically. However, in analysis, there might be variables that are supposed to be in the model regardless of measure of significance. For example, we can not present a model without predictor of interest even if the this variable had a non-significant p-value. Or another example, a necessary control variable may have a non-significant p-value, but it can not be removed. Due to lack of information, we didn't know if there were such variable. 
+
+3. Variance inflcation factor for changes in gastrointestinal scores and mental health scores in this model are greater than 3. Though we decided to ignore that because the most commonly used standard for VIF is rule of 10 [@o2007caution], exactly how large a VIF has to be before it causes issues is a subject of debate. So if furture analysts prefer a very strict standard, such as 2.5, they need to concern about multicolinarity here. 
+
+```{r}
+if (!requireNamespace("car", quietly = TRUE)){
+  install.packages('car')
+}
+library('car')
+
+residual_fit<-lm(BLRScore_change ~ GastrointestinalScore_change+CancerScore_change+MentalHealthScore_change
+                 +DietScore_change+PhysicalActivityScore_change+FinancialHealthScore_change+MedicationScore_change
+                 +AlcoholScore_change+StressScore_change+SmokingScore_change,data=BLR_data)
+#knitr::kable(coef(residual_fit),digits = 3,caption = 'Coefficient of health-risk factors by LASSO',format = 'markdown')
+
+knitr::kable(car::vif(residual_fit),digits = 3, format = 'pandoc', col.names ='VIF', caption = 'VIF table')
+```
+
+## Model 2
+
+1. The research question is ambiguous since **'frequency of usage of the platform'** was not clearly defined. There was no variable labeled as 'frequency' in original files provided by collaborator and the collaborator did not tell us which variable matched their idea of 'frequency of platform usage'. Moreover, we were not given information about how to represent **'frequency of usage of the platform'** using data from original files. Though we tried to fit several models with various representation of **'frequency of usage of the platform'** and obtained consistent conclusion, if collaborator's idea of **'frequency of usage of the platform'** was not in our set of definitions, result from current analysis may become invalid.
+
+2. Refer to our result, higher frequency of platform usage is not associated with higher rate of BLR score improvement, which is counter-intuitive. Intuitively speaking, people were supposed to perform better with help from supervisor and advisor. Reason underlying this counter-intuitive result can be a direction for future investigation.
+
+## Suggestion for furture data collection
+
+At last, we have some suggestions for data collection process. As we have mentioned in data manipulation part, the original data files contain too many invalid data entries,which is evitible if the data collection process was refined. Specific suggestion are listed below:
+
+1. Add time limit for data entry. An data entry that are altered two weeks after creation cannot reflect a concise health state.
+
+2. Creating multiple entries in one day are not supposed to be allowed. Users are supposed to alter the created entry rather than create a new one.
+
+3. Limit range for variables. There were non-human data input in the original data files. For example, there were observations with BMI value less than 1.
+
+# References
+
+---
+nocite: '@*'
+...
