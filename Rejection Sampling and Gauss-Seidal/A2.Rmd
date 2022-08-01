@@ -1,0 +1,179 @@
+---
+title: "A2"
+author: "Yuhan Hu"
+date: "2019/10/18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Q1
+## A
+
+First transform $(u,v)$ to $(x,y)$ where $x=v/u,y=u,v=xu$
+
+Jacobian of this transformation is
+
+$$\begin{bmatrix}
+{rrr}
+\frac{\partial u}{\partial x} & \frac{\partial v}{\partial x}\\
+\frac{\partial u}{\partial y} & \frac{\partial v}{\partial y}
+\end{bmatrix}
+$$
+
+absolute value of determinant of jacobian is $|0\times \frac{\partial v}{\partial y}-1\times u|=u$(since $0\leq u$)
+
+Then joint density of (u,x) is $f(x,y)=f(y,x)=f(u,x)=f(u,v)|J|=\frac{u}{|C_h|}$
+
+Marginal density of X is
+
+$f_{X}(x)=\int_{0}^{\sqrt{h(x)}} \frac{u}{|C_h|}du = \frac{h(x)}{2|C_h|}$
+
+which is $\gamma h(x)$ where $\gamma = \frac{1}{2|C_h|}$
+
+
+## B
+
+If $(u,v)\in C_h$, then as given above $0\le u\le\sqrt{h(v/u)}$, also we have $X=V/U$, so $u\le \sqrt{h(x)}$
+
+therefore we have $u_+=\underset{x} \max\sqrt{h(x)}$
+
+$u\le \sqrt{h(x)}\Rightarrow 1\le \frac{1}{u}\sqrt{h(x)}$
+
+Then multiply both side by $v$, two cases here 
+
+Case 1. if v >0, then $\Rightarrow v\leq \frac{v}{u}\sqrt{h(x)}=x\sqrt{h(x)}\Rightarrow v\leq x\sqrt{h(x)}$
+
+Therefore $v_+ = \underset{x}\max x\sqrt{h(x)}$
+
+Case 2. if v <0, then $\Rightarrow v\geq \frac{v}{u}\sqrt{h(x)}=x\sqrt{h(x)}\Rightarrow v\geq x\sqrt{h(x)}$
+
+Then $v_-=\underset{x}\min x\sqrt{h(x)}$
+
+Case $v=0$ is not dicussed since this case is not related to $v_-$ nor $v_+$
+
+\pagebreak
+
+## C
+
+```{r, eval = FALSE}
+rnormal <- function(n) {
+  x <- NULL
+  upperv <- sqrt(2/exp(1))
+  lowerv <- -upperv
+  i <- 1
+  
+  while (i < n) {
+    u <- runif(1) # generate Unif(0,1) rv
+    v <- runif(1,lowerv,upperv) # generate unif rv with min lowerv and max upperv
+    
+    #rejection sampling test 
+    if (u <= exp(-(v/u)^2/4)) {
+      x <- c(x, v/u)
+      i <- i+1
+      }
+    }
+  
+  x
+  }
+```
+
+$D_h$ is the region rejection method workin on, and $C_h$ is the region accepted. Therefore, probability of that proposals are accepted is
+
+Area of $D_h$ is $|D_h| =2\times\sqrt{\frac{2}{e}}$
+
+The area of $C_h$ is $|C_h|=\int_{-\infty}^{\infty}e^{\frac{-x^2}{2}}dx=\sqrt{\pi/2}$
+
+$D_h$ is the region rejection method workin on, and $C_h$ is the region accepted.
+
+Therefore, probability of that proposals are accepted is the ratio $\frac{|C_h|}{|D_h|}=73.057\%$
+
+# Q2
+
+## A
+
+Given $y_i=a\times i+b$. Also we have the objective function is non-negative since it's squared
+
+To minimize the function, it is supposed to be as close to 0 as possible
+
+The objective function for estimate{$\theta_i$} is exactly 0 given $\theta_i=y_i$ since
+
+$\theta_{i+1}-2\theta_i+2\theta_{i+1}=a(i+1)+b-2[ai+b]+a(i-1)+b=0$
+
+and $y_i-\theta_i=0$
+
+Therefore, if ${y_i}$ is exactly linear, $\hat{\theta_i}=y_i$ for all i.
+
+## B
+Objective function is given above.
+
+$y^{*} -X\theta = \begin{bmatrix}y_1-\theta_1 \\y_2-\theta_2 \\y_n-\theta_n\\\sqrt{\lambda}(\theta_3-2\theta_2+\theta_1)\\...\\\sqrt{\lambda}(\theta_n-2\theta_{n-1}+\theta_{n-2}) \end{bmatrix}$
+
+then $\left\lVert y^{*} -X\theta\right\rVert^2$ equals to the given objective function, and thus value minmizing the objective function will minimize the function for this question
+
+$y^*=\begin{bmatrix} y_1 \\ y_2 \\ ... \\ y_n \\ 0 \\ ... \\ 0 \end{bmatrix}$
+
+$X = \begin{bmatrix} 1 & 0 & 0 & ... & 0\\0 & 1 & 0 &...& 0 \\...\\ \sqrt(\lambda) & 0 &0 &...& 1 \\ 0 & 0 &0 & ...& 0\\ ... \\0&0&0&...&0 \end{bmatrix}$
+
+
+
+## C
+
+
+
+## D
+```{r Q2D, echo = FALSE}
+HP <- function(x,lambda,p=20,niter=200) {
+        n <- length(x)
+        a <- c(1,-2,1)
+        aa <- c(a,rep(0,n-2))
+        aaa <- c(rep(aa,n-3),a)
+        mat <- matrix(aaa,ncol=n,byrow=T)
+        mat <- rbind(diag(rep(1,n)),sqrt(lambda)*mat)
+        xhat <- x
+        x <- c(x,rep(0,n-2))
+        sumofsquares <- NULL
+        for (i in 1:niter) {
+           w <- sort(sample(c(1:n),size=p))
+           xx <- mat[,w]
+           y <- x - mat[,-w]%*%xhat[-w]
+           r <- lsfit(xx,y,intercept=F)
+           xhat[w] <- r$coef
+           sumofsquares <- c(sumofsquares,sum(r$residuals^2))
+           }
+        r <- list(xhat=xhat,ss=sumofsquares)
+        r
+        }
+
+x <- read.table('yield.txt')
+x <- data.matrix(x)
+
+r1 <- HP(x,lambda=2000,p=10,niter=1000)
+r2 <- HP(x,lambda=2000,p=20,niter=1000)
+r3 <- HP(x,lambda=2000,p=30,niter=1000)
+r4 <- HP(x,lambda=2000,p=40,niter=1000)
+
+par(mfrow = c(2,2), oma=c(0,0,2,0))
+plot(r1$ss, main = 'p = 10')
+plot(r2$ss, main = 'p = 20')
+plot(r3$ss, main = 'p = 30')
+plot(r4$ss, main = 'p = 40')
+title(main = print('Plot of Objective function values generated with different p'), outer = T)
+
+par(mfrow = c(2,2), oma=c(0,0,2,0))
+plot(r1$ss[1:500], main = 'p = 10')
+plot(r2$ss[1:500], main = 'p = 20')
+plot(r3$ss[1:500], main = 'p = 30')
+plot(r4$ss[1:500], main = 'p = 40')
+title(main = print('Plot of Objective function values generated with different p\n index: 1-500'), outer = T)
+
+par(mfrow = c(2,2), oma=c(0,0,2,0))
+plot(r1$ss[501:1000], main = 'p = 10')
+plot(r2$ss[501:1000], main = 'p = 20')
+plot(r3$ss[501:1000], main = 'p = 30')
+plot(r4$ss[501:1000], main = 'p = 40')
+title(main = print('Plot of Objective function values generated with different p\n index: 501-1000'), outer = T)
+```
+Refer to plot, as **p** increase, objective function decreases faster and ultimately reach a smaller value. More specifically, objective function with greater **p** decreases much faster each iteration at the begining, but the differences in rate of change is getting less apparent as the iteration continue.

@@ -1,0 +1,22 @@
+HP <- function(x,lambda,p=20,niter=200) {
+        n <- length(x)
+        a <- c(1,-2,1)
+        aa <- c(a,rep(0,n-2))
+        aaa <- c(rep(aa,n-3),a)
+        mat <- matrix(aaa,ncol=n,byrow=T)
+        mat <- rbind(diag(rep(1,n)),sqrt(lambda)*mat)
+        xhat <- x
+        x <- c(x,rep(0,n-2))
+        sumofsquares <- NULL
+        for (i in 1:niter) {
+           w <- sort(sample(c(1:n),size=p))
+           xx <- mat[,w]
+           y <- x - mat[,-w]%*%xhat[-w]
+           r <- lsfit(xx,y,intercept=F)
+           xhat[w] <- r$coef
+           sumofsquares <- c(sumofsquares,sum(r$residuals^2))
+           }
+        r <- list(xhat=xhat,ss=sumofsquares)
+        r
+        }
+
