@@ -1,0 +1,23 @@
+leverage <- function(x,w,r=10,m=100) {
+               qrx <- qr(x)
+               n <- nrow(x)
+               lev <- NULL
+               for (i in 1:m) {
+                   v <- ifelse(runif(n)>0.5,1,-1)
+                   v[-w] <- 0
+                   v0 <- qr.fitted(qrx,v)
+                   f <- v0
+                   for (j in 2:r) {
+                      v0[-w] <- 0
+                      v0 <- qr.fitted(qrx,v0)
+                      f <- f + v0/j
+                      }
+                   lev <- c(lev,sum(v*f))
+                   }
+                std.err <- exp(-mean(lev))*sd(lev)/sqrt(m)
+                lev <- 1 - exp(-mean(lev))
+                r <- list(lev=lev,std.err=std.err)
+                r
+                }
+
+
