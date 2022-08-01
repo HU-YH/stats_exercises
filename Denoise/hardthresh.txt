@@ -1,0 +1,14 @@
+denoise <- function(dctmat,lambda) {
+             # if lambda is missing, set it to the 0.8 quantile of abs(dctmat)
+             if(missing(lambda)) lambda <- quantile(abs(dct),0.8)
+             # hard-thresholding
+             a <- dctmat[1,1]
+             dctmat1 <- ifelse(abs(dctmat)>lambda,dctmat,0)
+             dctmat1[1,1] <- a
+             # inverse DCT to obtain denoised image "clean"
+             clean <- mvdct(dctmat1,inverted=T)
+             clean <- ifelse(clean<0,0,clean)
+             clean <- ifelse(clean>1,1,clean)
+             clean
+             }
+

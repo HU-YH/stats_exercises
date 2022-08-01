@@ -1,0 +1,115 @@
+---
+title: "A1"
+author: "Yuhan"
+date: "2019/9/29"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dtt)
+boats <- matrix(scan('boats.txt'),ncol=256,byrow=T)
+```
+
+## Q1
+### a.
+${D_m}^{-1}{A_m}^T\hat{Z}A_n{D_n}^{-1}={D_m}^{-1}{A_m}^TA_mZ{A_n}^TA_n{D_n}^{-1}$
+
+since ${A_n}^TA_n=D_n$
+
+the above notation$={D_m}^{-1}D_mZD_n{D_n}^{-1}$
+
+$D_n$ is diagonal given
+
+${D_m}^{-1}D_m=D_n{D_n}^{-1}=I$
+
+so ${D_m}^{-1}{A_m}^T\hat{Z}A_n{D_n}^{-1}={D_m}^{-1}D_mZD_n{D_n}^{-1}=IZI=Z$
+
+### b.
+
+```{r, include=TRUE}
+###########Given function,labelled as denoise1()
+denoise1 <- function(dctmat,lambda) {
+  # if lambda is missing, set it to the 0.8 quantile of abs(dctmat)
+  if(missing(lambda)) lambda <- quantile(abs(dct),0.8)
+  # hard-thresholding
+  a <- dctmat[1,1]
+  dctmat1 <- ifelse(abs(dctmat)>lambda,dctmat,0)
+  dctmat1[1,1] <- a
+  # inverse DCT to obtain denoised image "clean"
+  clean <- mvdct(dctmat1,inverted=T)
+  clean <- ifelse(clean<0,0,clean)
+  clean <- ifelse(clean>1,1,clean)
+  clean
+}
+
+##########Modified Function,,labelled as denoise2()
+denoise2 <- function(dctmat,lambda) {
+  # if lambda is missing, set it to the 0.8 quantile of abs(dctmat)
+  if(missing(lambda)) lambda <- quantile(abs(dct),0.8)
+  # soft-thresholding
+  a <- dctmat[1,1]
+  dctmat1 <- sign(dctmat)*pmax(abs(dctmat)-lambda,0)
+  dctmat1[1,1] <- a
+  # inverse DCT to obtain denoised image "clean"
+  clean <- mvdct(dctmat1,inverted=T)
+  clean <- ifelse(clean<0,0,clean)
+  clean <- ifelse(clean>1,1,clean)
+  clean
+}
+```
+
+
+
+
+### c.
+```{r, echo = FALSE}
+mvdct.boats <- mvdct(boats)
+boats10 <- denoise1(mvdct.boats, lambda = 10)
+boats20 <- denoise1(mvdct.boats, lambda = 20)
+boats30 <- denoise1(mvdct.boats, lambda = 30)
+boats40 <- denoise1(mvdct.boats, lambda = 40)
+
+image(boats10,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 10',asp=1)
+image(boats20,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 20',asp=1)
+image(boats30,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 30',asp=1)
+image(boats40,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 40',asp=1)
+```
+
+```{r,echo = FALSE}
+mvdct.boats <- mvdct(boats)
+boats10 <- denoise2(mvdct.boats, lambda = 10)
+boats20 <- denoise2(mvdct.boats, lambda = 20)
+boats30 <- denoise2(mvdct.boats, lambda = 30)
+boats40 <- denoise2(mvdct.boats, lambda = 40)
+
+image(boats10,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 10',asp=1)
+image(boats20,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 20',asp=1)
+image(boats30,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 30',asp=1)
+image(boats40,axes = F,col = grey(seq(0,1,length=256)),sub='lambda = 40',asp=1)
+```
+
+For both method, as value of lamba increases, contrast of picture decreases. In addition, contrast of hard-threshold approach looks better to me.
+
+
+
+## 2
+
+### a.
+$E_X(s^X) = E_{U+2V}(s^{U+2V})=E_U(s^UE_{2V}(s^{2V}))=E_U(s^X)*E_{2V}(s^{2V})$
+
+$E(s^U)=E(s^{Poisson(\lambda_u)})= exp(\lambda_u(s-1))$
+
+$E(s^{2V}) = exp(\lambda_v(s^2-1))$
+
+$E_X(s^X) =E_U(s^X)*E_{2V}(s^{2V})=exp(\lambda_u(s-1))exp(\lambda_v(s^2-1))=exp(\lambda_u(s-1)+\lambda_v(s^2-1))$
+
+### b.
+
+
+
+###c.
+
+
+
+
