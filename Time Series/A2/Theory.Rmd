@@ -1,0 +1,117 @@
+---
+title: "STA457A2 Theory"
+author: "Yuhan Hu"
+date: "2020/06/02"
+header-includes:
+   - \usepackage{amsmath}
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(cansim)
+library(tidyverse)
+library(forecast)
+library(Metrics)
+library(seasonal)
+library(ggplot2)
+library(forecast)
+library(astsa)
+```
+
+# Theory
+
+## 1.
+
+### A.
+
+
+
+$E(Y|X=-1)=(-1)\times P(Y=-1|X=-1)+0\times P(Y=0|X=-1)+1\times P(Y=1|X=-1)$
+
+$=(-1)\times\frac{0.05}{0.05+0.1+0.15}+1\times\frac{0.15}{0.05+0.1+0.15}=\frac{1}{3}$
+
+
+
+
+
+$E(Y|X=0)=(-1)\times P(Y=-1|X=0)+0\times P(Y=0|X=0)+1\times P(Y=1|X=0)$
+
+$=(-1)\times\frac{0.15}{0.15+0.15+0.1}+1\times\frac{0.1}{0.15+0.15+0.1}=-\frac{1}{8}$
+
+
+
+
+
+$E(Y|X=1)=(-1)\times P(Y=-1|X=1)+0\times P(Y=0|X=1)+1\times P(Y=1|X=1)$
+
+$=(-1)\times\frac{0.15}{0.15+0.15}+1\times\frac{0.15}{0.15+0.15}=0$
+
+
+
+
+Therefore, $E[(Y-g(X))^2]=E[E[Y-g(X)]^2|X]$
+
+$=E[(Y-g(X=-1))^2|X=-1]\times P(X=-1)+E[(Y-g(X=0))^2|X=0]\times P(X=0)+E[(Y-g(X=1))^2|X=1]\times P(X=1)$
+
+$=E[(Y-\frac{1}{3})^2]\times 0.3+E[(Y-(-\frac{1}{8}))^2]\times 0.4+E[(Y-0)^2]\times 0.3$
+
+$E[Y^2-\frac{2}{3}Y+\frac{1}{9}|X=-1]\times0.3+E[Y^2+\frac{1}{4}Y+\frac{1}{64}|X=0]\times 0.4 + E[Y^2|X=1]\times 0.3$
+
+where $E[Y]=-1\times 0.35+0\times 0.25+1\times 0.4=0.05$,$E[Y^2|X=-1]=\frac{2}{3},E[Y^2|X=0]=\frac{5}{8},E[Y^2|X=1]=1$
+
+and $E[Y^2]=(-1)^2\times 0.35+0^2\times 0.25+1^2\times 0.4=0.75$
+
+Therefore, $E[(Y-g(X))^2]=0.71$
+
+### b.
+
+$E[(Y-\hat{Y})^2]=E[(Y-a-bX)^2]$
+
+To find minimum value, take partial derivative of both $a$ and $b$ and set the result equals 0.
+
+we have $E[(-2)(Y-a-bX)]=0$
+
+$E[(-2X)(Y-a-bX)]=0$
+
+Then we have $-2E[(Y-a-bX)]=0\rightarrow E[(Y-a-bX)]=0\rightarrow E[Y]-a-bE[X]=0\rightarrow a=E[Y]-bE[X]$
+
+and $2E[(-X)(Y-a-bX)]=0\rightarrow E[(-X)(Y-a-bX)]=0\rightarrow E[XY]-aE[X]-bE[X^2]=0$
+
+subsititute a, we have $E[XY]-(E[Y]-bE[X])E[X]-bE[X^2]=0\rightarrow E[XY]-E[X]E[Y]+bE[X]^2-bE[X^2]=0 \rightarrow b=\frac{cov(X,Y)}{var[X]}$
+
+From Part A, we know $E[Y]=0.05$,$E[Y^2]=0.75$
+
+also, $E[X]=0$,$E[X^2]=0.6$
+
+then $Var[X]=0.6-0^2=0.6$, $cov(X,Y)=E[XY]=0.05\times(-1)^2+0.15\times(+1)^2+(-1)(+1)\times 0.15+(+1)(-1)0.15=-0.1$
+
+Then $a=0.05,b=-\frac{1}{6}$
+
+$E[(Y-\hat{Y})^2]=E[Y^2-2Y\hat{Y}+\hat{Y}^2]=E[Y^2]-2E[Y\hat{Y}]+E[\hat{Y}^2]$ where $E[\hat{Y}]=E[a+bX]$
+
+then we have$E[(Y-\hat{Y})^2]=E[Y^2-2Y\hat{Y}+\hat{Y}^2]=E[Y^2]+2E[Y\hat{Y}]+E[\hat{Y}^2]$
+
+$=E[Y^2]+2E[Y(a+bX)]+E[(a+bX)^2]=E[Y^2]-2(aE[Y]+bE[XY])+E[a^2]+2abE[X]+b^2E[X^2]$
+
+subsititute values of $E[Y^2],E[XY]\text{ and }E[X]$, we have $E[(Y-\hat{Y})^2]=0.778$
+
+
+
+## 2.
+
+### A.
+
+$X_{n+1}^n=E[X_{n+1}|X_1...X_n]=E[\phi X_n+W_{n+1}|X_1...X_n]=\phi X_n$
+
+$X_{n+2}^{n}=E[X_{n+2}|X_1...X_n]=E[\phi X_{n+1}+W_{n+1}|X_1...X_n]=E[\phi (\phi X_{n}+W_{n+1})|X_1...X_n]=\phi^2X_n$
+
+$Cov[(X_{n+1}-X_{n+1}^{n}),(X_{n+2}-X_{n+2}^n)]=Cov[W_{n+1},\phi W_{n+1}+W_{n+2}]=\phi Cov[W_{n+1},W_{n+1}]=\phi \sigma_W^2$
+
+### b.
+
+$X_{n}^{n-1}=E[X_{n}|X_1...X_{n-1}]=E[\phi X_{n-1}+W_n|X_1...X_{n-1}]=\phi X_{n-1}$
+
+$Cov[(X_n-X_{n}^{n-1}),(X_{n+1}-X_{n+1}^{n})]=Cov[\phi X_{n-1}+W_n-(\phi X_{n-1}),\phi X_n+W_{n+1}-(\phi X_n)]=0$

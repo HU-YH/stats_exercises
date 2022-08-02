@@ -1,0 +1,28 @@
+---
+title: "Theory"
+author: "Yuhan Hu"
+date: "2020/6/15"
+output: pdf_document
+---
+
+# 1
+
+## a.
+
+
+
+## b.
+
+
+
+# 2
+
+## a.
+
+
+
+## b.
+
+
+
+## c.

@@ -1,0 +1,208 @@
+---
+title: "STA457A1 Practice"
+author: "Yuhan Hu"
+date: "2020/06/01"
+header-includes:
+   - \usepackage{amsmath}
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(cansim)
+library(tidyverse)
+library(forecast)
+library(Metrics)
+library(seasonal)
+library(ggplot2)
+library(forecast)
+library(astsa)
+```
+
+# Theory
+
+## 1.
+
+### A.
+
+
+
+$E(Y|X=-1)=(-1)\times P(Y=-1|X=-1)+0\times P(Y=0|X=-1)+1\times P(Y=1|X=-1)$
+
+$=(-1)\times\frac{0.05}{0.05+0.1+0.15}+1\times\frac{0.15}{0.05+0.1+0.15}=\frac{1}{3}$
+
+
+
+
+
+$E(Y|X=0)=(-1)\times P(Y=-1|X=0)+0\times P(Y=0|X=0)+1\times P(Y=1|X=0)$
+
+$=(-1)\times\frac{0.15}{0.15+0.15+0.1}+1\times\frac{0.1}{0.15+0.15+0.1}=-\frac{1}{8}$
+
+
+
+
+
+$E(Y|X=1)=(-1)\times P(Y=-1|X=1)+0\times P(Y=0|X=1)+1\times P(Y=1|X=1)$
+
+$=(-1)\times\frac{0.15}{0.15+0.15}+1\times\frac{0.15}{0.15+0.15}=0$
+
+
+
+
+Therefore, $E[(Y-g(X))^2]=E[E[Y-g(X)]^2|X]$
+
+$=E[(Y-g(X=-1))^2|X=-1]\times P(X=-1)+E[(Y-g(X=0))^2|X=0]\times P(X=0)+E[(Y-g(X=1))^2|X=1]\times P(X=1)$
+
+$=E[(Y-\frac{1}{3})^2]\times 0.3+E[(Y-(-\frac{1}{8}))^2]\times 0.4+E[(Y-0)^2]\times 0.3$
+
+$E[Y^2-\frac{2}{3}Y+\frac{1}{9}|X=-1]\times0.3+E[Y^2+\frac{1}{4}Y+\frac{1}{64}|X=0]\times 0.4 + E[Y^2|X=1]\times 0.3$
+
+where $E[Y]=-1\times 0.35+0\times 0.25+1\times 0.4=0.05$,$E[Y^2|X=-1]=\frac{2}{3},E[Y^2|X=0]=\frac{5}{8},E[Y^2|X=1]=1$
+
+and $E[Y^2]=(-1)^2\times 0.35+0^2\times 0.25+1^2\times 0.4=0.75$
+
+Therefore, $E[(Y-g(X))^2]=0.71$
+
+### b.
+
+$E[(Y-\hat{Y})^2]=E[(Y-a-bX)^2]$
+
+To find minimum value, take partial derivative of both $a$ and $b$ and set the result equals 0.
+
+we have $E[(-2)(Y-a-bX)]=0$
+
+$E[(-2X)(Y-a-bX)]=0$
+
+Then we have $-2E[(Y-a-bX)]=0\rightarrow E[(Y-a-bX)]=0\rightarrow E[Y]-a-bE[X]=0\rightarrow a=E[Y]-bE[X]$
+
+and $2E[(-X)(Y-a-bX)]=0\rightarrow E[(-X)(Y-a-bX)]=0\rightarrow E[XY]-aE[X]-bE[X^2]=0$
+
+subsititute a, we have $E[XY]-(E[Y]-bE[X])E[X]-bE[X^2]=0\rightarrow E[XY]-E[X]E[Y]+bE[X]^2-bE[X^2]=0 \rightarrow b=\frac{cov(X,Y)}{var[X]}$
+
+From Part A, we know $E[Y]=0.05$,$E[Y^2]=0.75$
+
+also, $E[X]=0$,$E[X^2]=0.6$
+
+then $Var[X]=0.6-0^2=0.6$, $cov(X,Y)=E[XY]=0.05\times(-1)^2+0.15\times(+1)^2+(-1)(+1)\times 0.15+(+1)(-1)0.15=-0.1$
+
+Then $a=0.05,b=-\frac{1}{6}$
+
+$E[(Y-\hat{Y})^2]=E[Y^2-2Y\hat{Y}+\hat{Y}^2]=$
+
+
+
+## 2.
+
+### A.
+
+$X_{n+1}^n=E[X_{n+1}|X_1...X_n]=E[\phi X_n+W_{n+1}|X_1...X_n]=\phi X_n$
+
+$X_{n+2}^{n}=E[X_{n+2}|X_1...X_n]=E[\phi X_{n+1}+W_{n+1}|X_1...X_n]=E[\phi (\phi X_{n}+W_{n+1})|X_1...X_n]=\phi^2X_n$
+
+$Cov[(X_{n+1}-X_{n+1}^{n}),(X_{n+2}-X_{n+2}^n)]=Cov[W_{n+1},\phi W_{n+1}+W_{n+2}]=\phi Cov[W_{n+1},W_{n+1}]=\phi \sigma_W^2$
+
+### b.
+
+$X_{n}^{n-1}=E[X_{n}|X_1...X_{n-1}]=E[\phi X_{n-1}+W_n|X_1...X_{n-1}]=\phi X_{n-1}$
+
+$Cov[(X_n-X_{n}^{n-1}),(X_{n+1}-X_{n+1}^{n})]=Cov[\phi X_{n-1}+W_n-(\phi X_{n-1}),\phi X_n+W_{n+1}-(\phi X_n)]=0$
+
+\newpage
+
+# Practice
+
+
+## Exploratory data analysis and pre-processing
+Here we are investigating change of Canadian potato prices. Though no extra information about the data(i.e. years the data was collected, frequency of data) was given, since the data measures prices changes nationwide while we have a large extent of change, it is unlikely to be collected in short time period. Therefore, this is monthly data. In addition, from the plot of time series, the data is clearly not stationary since the data is not varying around a horizontal line(i.e. the mean is not constant), and the extent of fluctuation is varying(i.e. non-constant variance).
+
+
+
+```{r}
+
+#data import and exploratory plot
+data <- read.csv('1001311626.csv')
+prices <- ts(data$Canadian.Potato.Prices,frequency = 12)
+plot(prices,main = 'Canadian Potato Prices')
+```
+
+The ACF has repeating pattern that are fading as lag increases, this represent existence of seasonlity, which can also be found on the original time series plot. Also, trend can be found on the original plot since the data point are not flutuating around constant mean.
+
+Since the variance is not constant, we may want to do a BoxCox tranformation. Corresponding table are shown in the Appendix. However, all returned values are close to 1; thus, BoxCox transformation is not feasible for our dataset.
+
+```{r,eval = FALSE}
+BoxCox(prices,lambda = 'auto')
+```
+
+Then the data is decomposed using classical decomposition for a closer look on seasonality and trend. It is shown clearly that the data is seaonal and has trend since the trend plot is not horizontal line and the seasonal plot has repeating pattern. Therefore, we extract remainder to construct a more stationary time series for further analysis.
+
+
+```{r}
+par(mfrow=c(1,2))
+acf(prices, main = 'ACF plot')
+pacf(prices, main = 'PACF plot')
+
+#Decomposition
+dc <- decompose(prices)
+plot(dc)
+Remainder <- dc$random
+#Remainder <- BoxCox(Remainder,lambda = 'auto')
+```
+
+## Model
+
+```{r}
+par(mfrow=c(1,2))
+acf(Remainder,na.action = na.pass, main = 'Remainder ACF plot')
+pacf(Remainder,na.action = na.pass, main = 'Remainder PACF plot')
+```
+
+Since the original time series is not stationary, and simple transformation can not solve the problem, model is built on the remainder part from classical decomposition.AR(p) model is chosen here since ACF tails off and PACF cuts off. In addition, in order to compare goodness of fit, we also use built-in function auto.arima() to get an auto-fitted model.
+
+```{r,results = 'hide'}
+model.ar <- arima(Remainder, c(14,0,0)) 
+model.auto <- auto.arima(Remainder, seasonal = FALSE, stationary = TRUE)
+```
+
+Based on the p-value returend by performing Ljung-Box test, we can conclude that our AR(14) model is better than the auto-fitted AR(3) model, regardless of complexity. 
+
+```{r}
+
+Box.test(model.ar$residuals,type = c("Ljung-Box"))$p.value
+Box.test(model.auto$residuals,type = c("Ljung-Box"))$p.value
+```
+
+## Limitation
+
+```{r, results='hide',fig.keep='all'}
+sarima(Remainder,14,0,0)
+```
+
+The residual ACF looks good since all auto-correlation are within the bound(except the auto-correlation beween the same data entry, which is always 1). The normal qq plot is not perfect, the normal qq line is close to y=x, but difference beween  The residuals seems to have constant mean Despite model complexity introduced by the high order of model, this is a good fit. 
+
+## Prediction
+
+```{r}
+fore <- forecast(model.ar,h=12)
+plot(fore)
+```
+
+```{r}
+out <- c(prices,as.numeric(fore$mean)+as.numeric(tail(dc$seasonal,n=12))+as.numeric(tail(na.omit(dc$trend),n=1)))
+write.csv(out,'submission/1001311626.csv',row.names = FALSE,col.names=FALSE)
+```
+
+\newpage
+
+## Appendix
+
+### BoxCox
+
+```{r}
+BoxCox(prices,lambda = 'auto')
+```
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```

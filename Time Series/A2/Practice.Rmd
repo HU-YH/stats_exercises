@@ -1,0 +1,115 @@
+---
+title: "STA457A1 Practice"
+author: "Yuhan Hu"
+date: "2020/06/02"
+header-includes:
+   - \usepackage{amsmath}
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(cansim)
+library(tidyverse)
+library(forecast)
+library(Metrics)
+library(seasonal)
+library(ggplot2)
+library(forecast)
+library(astsa)
+```
+ 
+# Practice
+
+
+## Exploratory data analysis and pre-processing
+Here we are investigating change of Canadian potato prices. Though no extra information about the data(i.e. years the data was collected, frequency of data) was given, since the data measures prices changes nationwide while we have a large extent of change, it is unlikely to be collected in short time period. Therefore, this is monthly data. In addition, from the plot of time series, the data is clearly not stationary since the data is not varying around a horizontal line(i.e. the mean is not constant), and the extent of fluctuation is varying(i.e. non-constant variance).
+
+
+
+```{r}
+
+#data import and exploratory plot
+data <- read.csv('1001311626.csv')
+prices <- ts(data$Canadian.Potato.Prices,frequency = 12)
+plot(prices,main = 'Canadian Potato Prices')
+```
+
+The ACF has repeating pattern that are fading as lag increases, this represent existence of seasonlity, which can also be found on the original time series plot. Also, trend can be found on the original plot since the data point are not flutuating around constant mean.
+
+Since the variance is not constant, we may want to do a BoxCox tranformation. Corresponding table are shown in the Appendix. However, all returned values are close to 1; thus, BoxCox transformation is not feasible for our dataset.
+
+```{r,eval = FALSE}
+BoxCox(prices,lambda = 'auto')
+```
+
+Then the data is decomposed using classical decomposition for a closer look on seasonality and trend. It is shown clearly that the data is seaonal and has trend since the trend plot is not horizontal line and the seasonal plot has repeating pattern. Therefore, we extract remainder to construct a more stationary time series for further analysis.
+
+
+```{r}
+par(mfrow=c(1,2))
+acf(prices, main = 'ACF plot')
+pacf(prices, main = 'PACF plot')
+
+#Decomposition
+dc <- decompose(prices)
+plot(dc)
+Remainder <- dc$random
+```
+
+## Model
+
+```{r}
+par(mfrow=c(1,2))
+acf(Remainder,na.action = na.pass, main = 'Remainder ACF plot')
+pacf(Remainder,na.action = na.pass, main = 'Remainder PACF plot')
+```
+
+Since the original time series is not stationary, and simple transformation can not solve the problem, model is built on the remainder part from classical decomposition.AR(14) model is chosen here since ACF tails off and PACF cuts off after lag 14. However, as the ACF plot shown, seasonlity persists in the remainder component. There, in order to compare goodness of fit, we also use built-in function auto.arima() to get an auto-fitted model with seasonality for the remainder component. auto.arima() function gives arima model(2,0,1)(1,0,1)[12], where (2,0,1) is the orders of AR/MA terms, (1,0,1) is orders of seasonal AR/MA terms, and 12 is the span of the periodic seasonal behavior.
+
+```{r,results = 'hide'}
+model.ar <- arima(Remainder, c(14,0,0)) 
+model.auto <- auto.arima(Remainder, seasonal = TRUE)
+model.ar
+model.auto
+```
+
+### Model comparision and Limitation
+
+```{r,results='hide',fig.keep='all'}
+a <- sarima(Remainder,14,0,0)
+sarima(Remainder,2,0,1,P=1,D=0,Q=1,S=12)
+```
+
+Compare the Ljung-Box plot for these two models, the AR(14) model has no Ljung-Box test value above the bound ,the null hypothese is rejected, the residuals are not independent, while most points on Ljung-Box plot of the auto-generated arima(2,0,1)(1,0,1)[12] model are above significant bound. Therefore, we prefer the auto-generated arima(2,0,1)(1,0,1)[12] model.
+
+As for the chosen arima(2,0,1)(1,0,1)[12] model, the residual ACF looks good since all auto-correlation are within the bound. The normal qq plot is not perfect, the normal qq line is close to y=x, but the difference can be detected from the graph. Deviation from normality means the quality of fit may be further improved with proper transformation on data. The residuals seems to have constant 0-mean & nearly constant variance, and it has thiner tail than the normal, but otherwise symmetric. Overall, this is a good fit. 
+
+## Prediction
+
+Here we use forecast() function for 1-step to 12-step predictor, with predicted value, 95% CI and 80% CI shown on the graph.
+
+```{r}
+fore <- forecast(model.auto,h=12)
+plot(fore)
+```
+
+```{r}
+out <- c(prices,as.numeric(fore$mean)+as.numeric(tail(dc$seasonal,n=12))+as.numeric(tail(na.omit(dc$trend),n=1)))
+write.csv(out,'submission/1001311626.csv',row.names = FALSE,col.names = FALSE)
+```
+
+\newpage
+
+## Appendix
+
+### BoxCox
+
+```{r}
+BoxCox(prices,lambda = 'auto')
+```
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
